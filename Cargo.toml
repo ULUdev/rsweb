@@ -2,8 +2,13 @@
 name = "rsweb"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Moritz Sokoll <moritz@sokoll.com>"]
+license = "MIT"
+homepage = "https://gitlab.sokoll.com/moritz/rsweb"
+repository = "https://gitlab.sokoll.com/moritz/rsweb"
+documentation = "https://docs.rs/rsweb"
+readme = "README.md"
+description = "library for creating multithreaded web servers in rust"
 
 [lib]
 name = "rsweb"
