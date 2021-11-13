@@ -75,7 +75,12 @@ impl ThreadPool {
     /// give a job to execute to the threadpool
     pub fn execute<F>(&self, f: F) where F: FnOnce() + Send + 'static {
         let job = Box::new(f);
-        self.sender.send(Msg::Exec(job)).unwrap();
+        match self.sender.send(Msg::Exec(job)) {
+            Ok(_) => (),
+            Err(e) => {
+                eprintln!("failed to execute task: {}", e);
+            }
+        }
     }
 }
 

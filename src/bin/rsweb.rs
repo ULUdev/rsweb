@@ -1,12 +1,12 @@
-use rsweb::tp;
-use rsweb::http;
+use rsweb::ressource::RessourceLoader;
+use rsweb::server::Server;
 
 fn main() {
-    let threadpool = tp::ThreadPool::new(4);
-    for _ in 0..15 {
-        threadpool.execute(|| {
-            println!("ok");
-            std::thread::sleep_ms(1000);
-        });
-    }
+    let mut server = Server::new(
+        10,
+        RessourceLoader::new(10, ".".to_string()),
+        8080,
+        std::net::IpAddr::V4(std::net::Ipv4Addr::new(127, 0, 0, 1)),
+    );
+    server.run("log.txt");
 }

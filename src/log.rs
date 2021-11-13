@@ -9,7 +9,6 @@ pub enum LogType {
     Warning,
     Error,
     Log,
-    Status,
 }
 
 /// A logger that logs to stderr and/or a file
@@ -52,11 +51,21 @@ impl Logger {
                         _ => (),
                     }
                 }
+                if let Some(n) = &mut self.file {
+                    match n.write(format!("[{}] Warning: {}\n", cur_time, msg).as_str().as_bytes()) {
+                        _ => (),
+                    }
+                }
             }
             LogType::Error => {
                 let cur_time: DateTime<Local> = Local::now();
                 if let Some(n) = &self.term {
                     match n.eprintln(format!("[{}] {}Error: {}{}{}", cur_time, fg(Color::Red), fg(Color::White), msg, sp(Special::Reset))) {
+                        _ => (),
+                    }
+                }
+                if let Some(n) = &mut self.file {
+                    match n.write(format!("[{}] Error: {}\n", cur_time, msg).as_str().as_bytes()) {
                         _ => (),
                     }
                 }
@@ -68,8 +77,24 @@ impl Logger {
                         _ => (),
                     }
                 }
+                if let Some(n) = &mut self.file {
+                    match n.write(format!("[{}]: {}\n", cur_time, msg).as_str().as_bytes()) {
+                        _ => (),
+                    }
+                }
             }
-            _ => (),
         }
     }
 }
+
+// impl Clone for Logger {
+//     fn clone(&self) -> Logger {
+//         let term = match self.term {
+//             Some(_) => Some(btui::Terminal::default()),
+//             None => None
+//         };
+//         let f = match self.file {
+//             Some(n) => Some(n.clone())
+//         }
+//     }
+// }

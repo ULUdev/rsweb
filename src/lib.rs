@@ -4,6 +4,10 @@
 pub mod tp;
 pub mod http;
 pub mod log;
+pub mod ressource;
+pub mod server;
+
+pub use tp::ThreadPool;
 
 #[cfg(test)]
 mod tests {
