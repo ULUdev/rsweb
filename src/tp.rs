@@ -1,10 +1,9 @@
 // Note: this threadpool implementation is pretty much taken from the rust language book
+use crate::log::*;
+use std::sync::mpsc;
 use std::sync::Arc;
 use std::sync::Mutex;
-use std::sync::mpsc;
 use std::thread;
-use crate::log::*;
-
 
 /// type alias for a job to execute in a thread
 type Job = Box<dyn FnOnce() + Send + 'static>;
@@ -15,7 +14,6 @@ pub enum Msg {
     Terminate,
 }
 
-
 /// A worker in the threadpool recieving jobs and executing them
 pub struct Worker {
     id: usize,
@@ -23,7 +21,6 @@ pub struct Worker {
 }
 
 impl Worker {
-
     /// construct a new worker
     /// # Arguments
     /// *`id`: the id this worker uses for logging purposes
@@ -43,10 +40,12 @@ impl Worker {
                 }
             }
         });
-        Worker { id, thread: Some(thread) }
+        Worker {
+            id,
+            thread: Some(thread),
+        }
     }
 }
-
 
 /// a thread pool with a set amount of threads
 pub struct ThreadPool {
@@ -55,8 +54,6 @@ pub struct ThreadPool {
 }
 
 impl ThreadPool {
-
-
     /// create a new threadpool with `size` many threads
     pub fn new(size: usize) -> ThreadPool {
         assert!(size > 0);
@@ -73,7 +70,10 @@ impl ThreadPool {
     }
 
     /// give a job to execute to the threadpool
-    pub fn execute<F>(&self, f: F) where F: FnOnce() + Send + 'static {
+    pub fn execute<F>(&self, f: F)
+    where
+        F: FnOnce() + Send + 'static,
+    {
         let job = Box::new(f);
         match self.sender.send(Msg::Exec(job)) {
             Ok(_) => (),

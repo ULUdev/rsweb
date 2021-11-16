@@ -3,7 +3,6 @@ pub struct Body {
 }
 
 impl Body {
-    
     pub fn new(content: String) -> Body {
         Body { content }
     }

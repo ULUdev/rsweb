@@ -1,9 +1,12 @@
 use btui::Terminal;
+use btui::{
+    effects::*,
+    print::{fg, sp},
+};
+use chrono::prelude::*;
 use std::fs::File;
 use std::fs::OpenOptions;
 use std::io::Write;
-use chrono::prelude::*;
-use btui::{effects::*, print::{fg, sp}};
 
 pub enum LogType {
     Warning,
@@ -19,7 +22,10 @@ pub struct Logger {
 
 impl Logger {
     pub fn new() -> Logger {
-        Logger { term: None, file: None }
+        Logger {
+            term: None,
+            file: None,
+        }
     }
 
     /// set the log file to log to for the logger
@@ -47,12 +53,23 @@ impl Logger {
             LogType::Warning => {
                 let cur_time: DateTime<Local> = Local::now();
                 if let Some(n) = &self.term {
-                    match n.eprintln(format!("[{}] {}Warning: {}{}{}", cur_time, fg(Color::Yellow), fg(Color::White), msg, sp(Special::Reset))) {
+                    match n.eprintln(format!(
+                        "[{}] {}Warning: {}{}{}",
+                        cur_time,
+                        fg(Color::Yellow),
+                        fg(Color::White),
+                        msg,
+                        sp(Special::Reset)
+                    )) {
                         _ => (),
                     }
                 }
                 if let Some(n) = &mut self.file {
-                    match n.write(format!("[{}] Warning: {}\n", cur_time, msg).as_str().as_bytes()) {
+                    match n.write(
+                        format!("[{}] Warning: {}\n", cur_time, msg)
+                            .as_str()
+                            .as_bytes(),
+                    ) {
                         _ => (),
                     }
                 }
@@ -60,12 +77,23 @@ impl Logger {
             LogType::Error => {
                 let cur_time: DateTime<Local> = Local::now();
                 if let Some(n) = &self.term {
-                    match n.eprintln(format!("[{}] {}Error: {}{}{}", cur_time, fg(Color::Red), fg(Color::White), msg, sp(Special::Reset))) {
+                    match n.eprintln(format!(
+                        "[{}] {}Error: {}{}{}",
+                        cur_time,
+                        fg(Color::Red),
+                        fg(Color::White),
+                        msg,
+                        sp(Special::Reset)
+                    )) {
                         _ => (),
                     }
                 }
                 if let Some(n) = &mut self.file {
-                    match n.write(format!("[{}] Error: {}\n", cur_time, msg).as_str().as_bytes()) {
+                    match n.write(
+                        format!("[{}] Error: {}\n", cur_time, msg)
+                            .as_str()
+                            .as_bytes(),
+                    ) {
                         _ => (),
                     }
                 }

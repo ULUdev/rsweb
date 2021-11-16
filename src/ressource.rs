@@ -1,7 +1,7 @@
 use std::collections::HashMap;
-use std::path::Path;
 use std::fs::OpenOptions;
 use std::io::Read;
+use std::path::Path;
 
 #[derive(Clone)]
 pub struct RessourceLoader {
@@ -10,10 +10,12 @@ pub struct RessourceLoader {
 }
 
 impl RessourceLoader {
-
     /// create a new RessourceLoader with a specified capacity and ressource root
     pub fn new(capacity: usize, root: String) -> RessourceLoader {
-        RessourceLoader { ressource_cache: HashMap::with_capacity(capacity), ressource_root: root }
+        RessourceLoader {
+            ressource_cache: HashMap::with_capacity(capacity),
+            ressource_root: root,
+        }
     }
 
     /// load a resource from cache or file system
@@ -24,10 +26,6 @@ impl RessourceLoader {
             Some(n) => n.to_string(),
             None => {
                 let p = Path::new(path.as_str());
-                //let p = p.join(Path::new(self.ressource_root.as_str()));
-                //let p = Path::new(self.ressource_root.as_str()).join(p);
-                //println!("path of ressource: {}", p.as_path().to_str().unwrap());
-                println!("path of ressource: {}", p.to_str().unwrap());
                 if !p.exists() {
                     return String::new();
                 } else {

@@ -1,6 +1,5 @@
-use super::Header;
 use super::Body;
-
+use super::Header;
 
 pub struct HTTPResponse {
     header: Header,
@@ -8,7 +7,6 @@ pub struct HTTPResponse {
 }
 
 impl HTTPResponse {
-    
     pub fn new(header: Header, body: Body) -> HTTPResponse {
         HTTPResponse { header, body }
     }

@@ -34,7 +34,6 @@ pub struct HTTPRequest {
 }
 
 impl HTTPRequest {
-    
     /// construct a new HTTP request
     pub fn new(method: HTTPMethod, path: String) -> HTTPRequest {
         HTTPRequest { method, path }

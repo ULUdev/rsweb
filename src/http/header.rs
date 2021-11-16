@@ -13,9 +13,10 @@ impl Header {
     }
     pub fn to_string(&self) -> String {
         let stat_string = match self.status {
-            StatusCode::Ok => "HTTP/1.1 200 OK".to_string(),
-            StatusCode::NotFound => "HTTP/1.1 404 NOT FOUND".to_string(),
-            StatusCode::InternalServerError => "HTTP/1.1 500 INTERNAL SERVER ERROR".to_string(),
+            StatusCode::Ok => "HTTP/1.1 200 OK\r\n".to_string(),
+            StatusCode::NotFound => "HTTP/1.1 404 NOT FOUND\r\n".to_string(),
+            StatusCode::InternalServerError => "HTTP/1.1 500 INTERNAL SERVER ERROR\r\n".to_string(),
+            StatusCode::MovedPermanently => "HTTP/1.1 301 MOVED PERMANENTLY\r\n".to_string(),
         };
         let mut header_string = String::new();
         header_string.push_str(stat_string.as_str());

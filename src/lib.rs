@@ -1,11 +1,12 @@
 //! # rsweb
 //! ## library for interacting with the http protocol and creating a multithreaded web server
 
-pub mod tp;
 pub mod http;
 pub mod log;
 pub mod ressource;
+pub mod route;
 pub mod server;
+pub mod tp;
 
 pub use tp::ThreadPool;
 
