@@ -8,6 +8,7 @@ use std::fs::File;
 use std::fs::OpenOptions;
 use std::io::Write;
 
+/// the type of log
 pub enum LogType {
     Warning,
     Error,
@@ -21,6 +22,7 @@ pub struct Logger {
 }
 
 impl Logger {
+    /// create a new logger
     pub fn new() -> Logger {
         Logger {
             term: None,
@@ -29,7 +31,6 @@ impl Logger {
     }
 
     /// set the log file to log to for the logger
-    ///
     /// # Returns
     /// A result that is an error variant if the file opening process fails
     pub fn set_logfile(&mut self, fname: &str) -> Result<(), std::io::Error> {
@@ -114,15 +115,3 @@ impl Logger {
         }
     }
 }
-
-// impl Clone for Logger {
-//     fn clone(&self) -> Logger {
-//         let term = match self.term {
-//             Some(_) => Some(btui::Terminal::default()),
-//             None => None
-//         };
-//         let f = match self.file {
-//             Some(n) => Some(n.clone())
-//         }
-//     }
-// }

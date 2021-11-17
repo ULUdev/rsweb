@@ -7,6 +7,7 @@ use std::io::{Read, Write};
 use std::net::IpAddr;
 use std::net::TcpListener;
 
+/// a rsweb server using a ressource loader and router
 pub struct Server {
     tp: ThreadPool,
     rl: RessourceLoader,
@@ -16,6 +17,14 @@ pub struct Server {
 }
 
 impl Server {
+
+    /// create a new server
+    /// # Arguments
+    /// * `capacity`: the amount of threads to use
+    /// * `rl`: the ressource loader to use
+    /// * `router`: the router to use
+    /// * `port`: the port to use
+    /// * `ip`: the ip address to run on
     pub fn new(
         capacity: usize,
         rl: RessourceLoader,

@@ -3,6 +3,7 @@ use std::fs::OpenOptions;
 use std::io::Read;
 use std::path::Path;
 
+/// a ressource loader and cacher
 #[derive(Clone)]
 pub struct RessourceLoader {
     ressource_cache: HashMap<String, String>,

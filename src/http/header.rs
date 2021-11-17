@@ -1,16 +1,17 @@
-// header
-
 use super::StatusCode;
 
+/// an http header
 pub struct Header {
     status: StatusCode,
     kv_pairs: Vec<String>,
 }
 
 impl Header {
+    /// create a new http header
     pub fn new(status: StatusCode, kv_pairs: Vec<String>) -> Header {
         Header { status, kv_pairs }
     }
+    /// parse the headers to a `String`
     pub fn to_string(&self) -> String {
         let stat_string = match self.status {
             StatusCode::Ok => "HTTP/1.1 200 OK\r\n".to_string(),

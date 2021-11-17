@@ -23,8 +23,8 @@ pub struct Worker {
 impl Worker {
     /// construct a new worker
     /// # Arguments
-    /// *`id`: the id this worker uses for logging purposes
-    /// *`reciever`: the recieving end of a channel
+    /// * `id`: the id this worker uses for logging purposes
+    /// * `reciever`: the recieving end of a channel
     pub fn new(id: usize, reciever: Arc<Mutex<mpsc::Receiver<Msg>>>) -> Worker {
         let thread = thread::spawn(move || loop {
             let job = reciever.lock().unwrap().recv().unwrap();

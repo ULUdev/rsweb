@@ -1,8 +1,10 @@
+/// an http body
 pub struct Body {
     content: String,
 }
 
 impl Body {
+    /// create an http body from some `content`
     pub fn new(content: String) -> Body {
         Body { content }
     }

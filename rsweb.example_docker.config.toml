@@ -1,0 +1,7 @@
+port = 8080
+ip = "0.0.0.0"
+threads = 10
+[ressources]
+root = "/rsweb"
+index = "/test.html"
+aliases = ["/test:/test.html"]

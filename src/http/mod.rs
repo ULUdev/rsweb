@@ -5,6 +5,7 @@ pub mod header;
 pub mod request;
 pub mod response;
 
+/// enum for supported http status codes
 pub enum StatusCode {
     Ok,
     NotFound,
