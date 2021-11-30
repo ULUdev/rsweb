@@ -69,7 +69,8 @@ impl SSLServer {
 
     /// run the SSL server
     /// # Arguments
-    pub fn run(&mut self) -> Result<(), std::io::Error> {
+    /// `lf`: the logfile to log to
+    pub fn run(&mut self, lf: &str) -> Result<(), std::io::Error> {
         let listener = match self.ip {
             IpAddr::V4(addr) => match TcpListener::bind(format!("{}:{}", addr, self.port)) {
                 Ok(n) => n,
@@ -86,6 +87,7 @@ impl SSLServer {
         };
         let mut logger = log::Logger::new();
         logger.set_term(btui::Terminal::default());
+        let _ = logger.set_logfile(lf);
         logger.log("starting server", log::LogType::Log);
         for stream in listener.incoming() {
             match stream {
@@ -93,10 +95,12 @@ impl SSLServer {
                     let acceptor = self.sslacceptor.clone();
                     let mut resload = self.rl.clone();
                     let router = self.router.clone();
+                    let logfile = lf.to_string();
 
                     self.tp.execute(move || {
                         let mut logging = log::Logger::new();
                         logging.set_term(btui::Terminal::new());
+                        let _ = logging.set_logfile(logfile.as_str());
                         let mut buf = [0u8; 1024];
                         let mut stream = match acceptor.accept(stream) {
                             Ok(n) => n,

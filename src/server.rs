@@ -74,10 +74,12 @@ impl Server {
                 Ok(mut stream) => {
                     let mut resload = self.rl.clone();
                     let router = self.router.clone();
+                    let logfile = lf.to_string();
                     //let mut lg = logger.clone();
                     self.tp.execute(move || {
                         let mut logging = log::Logger::new();
                         logging.set_term(btui::Terminal::new());
+                        let _ = logging.set_logfile(logfile.as_str());
                         let mut buf = [0u8; 1024];
                         match stream.read(&mut buf) {
                             Ok(_) => (),

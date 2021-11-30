@@ -16,6 +16,7 @@ pub struct Config {
     pub threads: Option<usize>,
     pub ressources: Ressource,
     pub ssl: Option<SslConfig>,
+    pub logfile: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -62,6 +63,7 @@ fn main() {
     let mut router = Router::new(index_page);
     let threads: usize = conf.threads.unwrap_or(4);
     let port: usize = conf.port;
+    let logfile: String = conf.logfile.unwrap_or(String::from("log.txt"));
     let routes: Vec<(String, String)> = conf.ressources.routes.unwrap_or(Vec::new()).iter().map(|x| {
         let mut parts = x.split(':');
         let lh = parts.next().unwrap_or("");
@@ -122,7 +124,7 @@ fn main() {
                     std::process::exit(1);
                 }
             };
-            match server.run() {
+            match server.run(logfile.as_str()) {
                 Ok(_) => (),
                 Err(e) => {
                     eprintln!("error at runtime: {}", e);
@@ -138,7 +140,7 @@ fn main() {
                 port,
                 addr,
             );
-            match server.run("log.txt") {
+            match server.run(logfile.as_str()) {
                 Ok(_) => (),
                 Err(e) => {
                     eprintln!("error at runtime: {}", e);

@@ -66,13 +66,12 @@ impl Logger {
                     }
                 }
                 if let Some(n) = &mut self.file {
-                    match n.write(
+                    let _ = n.write(
                         format!("[{}]: Warning: {}\n", cur_time, msg)
                             .as_str()
                             .as_bytes(),
-                    ) {
-                        _ => (),
-                    }
+                    );
+                    let _ = n.flush();
                 }
             }
             LogType::Error => {
@@ -90,13 +89,12 @@ impl Logger {
                     }
                 }
                 if let Some(n) = &mut self.file {
-                    match n.write(
+                    let _ = n.write(
                         format!("[{}]: Error: {}\n", cur_time, msg)
                             .as_str()
                             .as_bytes(),
-                    ) {
-                        _ => (),
-                    }
+                    );
+                    let _ = n.flush();
                 }
             }
             LogType::Log => {
@@ -107,9 +105,8 @@ impl Logger {
                     }
                 }
                 if let Some(n) = &mut self.file {
-                    match n.write(format!("[{}]: {}\n", cur_time, msg).as_str().as_bytes()) {
-                        _ => (),
-                    }
+                    let _ = n.write(format!("[{}]: {}\n", cur_time, msg).as_str().as_bytes());
+                    let _ = n.flush();
                 }
             }
         }

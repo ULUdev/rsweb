@@ -12,6 +12,7 @@ threads = 10
 port = 8080
 ip = "127.0.0.1"
 threads = 10
+logfile = "log.txt"
 [ressources]
 root = "."
 index = "/test.html"
@@ -19,11 +20,12 @@ aliases = ["/test:/test.html"]
 ```
 
 ## SSL
-`rsweb` has a SSL implementation. An example configuration looks like this:
+`rsweb` has an SSL implementation. An example configuration using SSL looks like this:
 ```toml
 port = 8080
 ip = "127.0.0.1"
 threads = 10
+logfile = "log.txt"
 [ressources]
 root = "."
 index = "/test.html"
