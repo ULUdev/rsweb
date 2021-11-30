@@ -1,0 +1,10 @@
+port = 8080
+ip = "127.0.0.1"
+threads = 10
+[ressources]
+root = "."
+index = "/test.html"
+aliases = ["/test:/test.html"]
+[ssl]
+private_key = "privkey.pem"
+certificate_chain = "certs.pem"
