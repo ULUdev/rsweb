@@ -1,15 +1,15 @@
-use openssl::ssl::{SslMethod, SslAcceptor, SslStream, SslFiletype};
+use crate::error::ServerError;
+use crate::http::request::HTTPRequest;
+use crate::http::response::HTTPResponse;
+use crate::http::*;
 use crate::log;
 use crate::ressource::RessourceLoader;
 use crate::route::*;
 use crate::ThreadPool;
-use crate::http::*;
-use crate::http::request::HTTPRequest;
-use crate::http::response::HTTPResponse;
-use std::io::{Read, Write};
+use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
+use std::io::Write;
 use std::net::IpAddr;
 use std::net::TcpListener;
-use crate::error::ServerError;
 use std::sync::Arc;
 
 /// an SSL/TLS server using a ressource loader and router
@@ -53,7 +53,9 @@ impl SSLServer {
         match acceptor.check_private_key() {
             Ok(n) => n,
             Err(_) => {
-                return Err(ServerError::new(format!("problem with private key: '{}'", privkeyfile).as_str()));
+                return Err(ServerError::new(
+                    format!("problem with private key: '{}'", privkeyfile).as_str(),
+                ));
             }
         }
         let acceptor = Arc::new(acceptor.build());
@@ -118,19 +120,28 @@ impl SSLServer {
                         };
                         let data: String = String::from(std::str::from_utf8(&buf).unwrap());
                         if let Ok(req) = HTTPRequest::from_string(data) {
-                            logging.log(format!("request: {} {}", req.get_method(), req.get_path()), log::LogType::Log);
+                            logging.log(
+                                format!("request: {} {}", req.get_method(), req.get_path()),
+                                log::LogType::Log,
+                            );
                             if let Some(n) = router.lookup(req.get_path()) {
                                 let resp = match n {
                                     Route::Route(p) => p,
                                     Route::Alias(q) => {
-                                        let response_body = resload.load(q[1..].to_string());
+                                        let (response_body, mime_type) =
+                                            resload.load(q[1..].to_string());
+                                        let mut header = Header::new(StatusCode::Ok);
+                                        header.add_kv_pair(
+                                            String::from("Content-Type"),
+                                            mime_type.to_string(),
+                                        );
                                         let mut response = HTTPResponse::new(
-                                            Header::new(StatusCode::Ok, Vec::new()),
+                                            header,
                                             Body::new(response_body.clone()),
                                         );
                                         if response_body.is_empty() {
                                             response = HTTPResponse::new(
-                                                Header::new(StatusCode::NotFound, Vec::new()),
+                                                Header::new(StatusCode::NotFound),
                                                 Body::new(String::from("<h1>404 not found</h1>")),
                                             );
                                         }
@@ -139,31 +150,41 @@ impl SSLServer {
                                 };
                                 match stream.write(resp.to_string().as_str().as_bytes()) {
                                     Ok(_) => (),
-                                    Err(_) => logging.log("failed to write to stream", log::LogType::Error),
+                                    Err(_) => logging
+                                        .log("failed to write to stream", log::LogType::Error),
                                 }
                                 match stream.flush() {
                                     Ok(_) => (),
-                                    Err(_) => logging.log("failed to flush stream", log::LogType::Error),
+                                    Err(_) => {
+                                        logging.log("failed to flush stream", log::LogType::Error)
+                                    }
                                 }
                             } else {
-                                let response_body = resload.load(req.get_path()[1..].to_string());
-                                let mut response = HTTPResponse::new(
-                                    Header::new(StatusCode::Ok, Vec::new()),
-                                    Body::new(response_body.clone()),
+                                let (response_body, mime_type) =
+                                    resload.load(req.get_path()[1..].to_string());
+                                let mut header = Header::new(StatusCode::Ok);
+                                header.add_kv_pair(
+                                    String::from("Content-Type"),
+                                    mime_type.to_string(),
                                 );
+                                let mut response =
+                                    HTTPResponse::new(header, Body::new(response_body.clone()));
                                 if response_body.is_empty() {
                                     response = HTTPResponse::new(
-                                        Header::new(StatusCode::NotFound, Vec::new()),
+                                        Header::new(StatusCode::NotFound),
                                         Body::new(String::from("<h1>404 not found</h1>")),
                                     );
                                 }
                                 match stream.write(response.to_string().as_str().as_bytes()) {
                                     Ok(_) => (),
-                                    Err(_) => logging.log("failed to write to stream", log::LogType::Error),
+                                    Err(_) => logging
+                                        .log("failed to write to stream", log::LogType::Error),
                                 }
                                 match stream.flush() {
                                     Ok(_) => (),
-                                    Err(_) => logging.log("failed to flush stream", log::LogType::Error),
+                                    Err(_) => {
+                                        logging.log("failed to flush stream", log::LogType::Error)
+                                    }
                                 }
                             }
                         }

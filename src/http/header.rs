@@ -8,8 +8,11 @@ pub struct Header {
 
 impl Header {
     /// create a new http header
-    pub fn new(status: StatusCode, kv_pairs: Vec<String>) -> Header {
-        Header { status, kv_pairs }
+    pub fn new(status: StatusCode) -> Header {
+        Header {
+            status,
+            kv_pairs: Vec::new(),
+        }
     }
     /// parse the headers to a `String`
     pub fn to_string(&self) -> String {
@@ -28,5 +31,10 @@ impl Header {
         header_vals = header_vals[..header_vals.len() - 2].to_string();
         header_string.push_str(header_vals.as_str());
         header_string
+    }
+
+    /// add a new key value pair
+    pub fn add_kv_pair(&mut self, k: String, v: String) {
+        self.kv_pairs.push(format!("{}:{}", k, v));
     }
 }

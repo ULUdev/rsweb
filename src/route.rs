@@ -42,17 +42,13 @@ impl Router {
     pub fn lookup(&self, key: String) -> Option<Route> {
         match self.routemap.get(&key) {
             Some(n) => {
-                let header = Header::new(
-                    StatusCode::MovedPermanently,
-                    vec![format!("Location: {}", n)],
-                );
+                let mut header = Header::new(StatusCode::MovedPermanently);
+
+                header.add_kv_pair(String::from("Location"), n.to_string());
                 let body = Body::new(String::new());
                 Some(Route::Route(HTTPResponse::new(header, body)))
             }
-            None => match self.aliasmap.get(&key) {
-                Some(n) => Some(Route::Alias(n.to_string())),
-                None => None,
-            },
+            None => self.aliasmap.get(&key).map(|n| Route::Alias(n.to_string())),
         }
     }
 }

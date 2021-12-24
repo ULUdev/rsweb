@@ -3,12 +3,14 @@ use std::fmt;
 
 #[derive(Debug)]
 pub struct ServerError {
-    msg: String
+    msg: String,
 }
 
 impl ServerError {
     pub fn new(msg: &str) -> ServerError {
-        ServerError { msg: msg.to_string() }
+        ServerError {
+            msg: msg.to_string(),
+        }
     }
 }
 

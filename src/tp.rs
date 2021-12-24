@@ -16,6 +16,7 @@ pub enum Msg {
 
 /// A worker in the threadpool recieving jobs and executing them
 pub struct Worker {
+    #[allow(dead_code)]
     id: usize,
     thread: Option<thread::JoinHandle<()>>,
 }

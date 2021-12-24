@@ -2,7 +2,7 @@
 //! ## library for interacting with the http protocol and creating a multithreaded web server
 //! To create a simple server just use the following code:
 //! ```rust
-//! 
+//!
 //! use rsweb::ressource::RessourceLoader;
 //! use rsweb::route::Router;
 //! use rsweb::server::Server;
@@ -33,14 +33,15 @@
 //! );
 //! ```
 
+pub mod config;
+pub mod error;
 pub mod http;
 pub mod log;
 pub mod ressource;
 pub mod route;
 pub mod server;
-pub mod tp;
 pub mod ssl;
-pub mod error;
+pub mod tp;
 
 pub use tp::ThreadPool;
 
