@@ -1,5 +1,5 @@
 use rsweb::config::{load_config, Config};
-use rsweb::ressource::RessourceLoader;
+use rsweb::resource::ResourceLoader;
 use rsweb::route::Router;
 use rsweb::server::Server;
 use rsweb::ssl::SSLServer;
@@ -21,17 +21,17 @@ fn main() {
         }
     };
     let index_page = conf
-        .ressources
+        .resources
         .index
         .unwrap_or_else(|| String::from("/index.html"));
     let mut router = Router::new(index_page);
     let threads: usize = conf.threads.unwrap_or(4);
     let port: usize = conf.port;
     let logfile: String = conf.logfile.unwrap_or_else(|| String::from("log.txt"));
-    let use_cache: bool = conf.ressource_cache.unwrap_or(true);
+    let use_cache: bool = conf.resource_cache.unwrap_or(true);
     let cache_cap: usize = conf.cache_capacity.unwrap_or(10);
     let routes: Vec<(String, String)> = conf
-        .ressources
+        .resources
         .routes
         .unwrap_or(Vec::new())
         .iter()
@@ -50,7 +50,7 @@ fn main() {
         router.route(lh, rh);
     }
     let aliases: Vec<(String, String)> = conf
-        .ressources
+        .resources
         .aliases
         .unwrap_or(Vec::new())
         .iter()
@@ -79,7 +79,7 @@ fn main() {
     // if let Some(n) = conf.ssl {
     //     let mut server = SSLServer::new(
     //         threads,
-    //         RessourceLoader::new(10, ".".to_string()),
+    //         ResourceLoader::new(10, ".".to_string()),
     //         router,
     //         port,
     //         addr,
@@ -91,7 +91,7 @@ fn main() {
         Some(n) => {
             let mut server = match SSLServer::new(
                 threads,
-                RessourceLoader::new(cache_cap, ".".to_string(), use_cache),
+                ResourceLoader::new(cache_cap, ".".to_string(), use_cache),
                 router,
                 port,
                 addr,
@@ -115,7 +115,7 @@ fn main() {
         None => {
             let mut server = Server::new(
                 threads,
-                RessourceLoader::new(cache_cap, ".".to_string(), use_cache),
+                ResourceLoader::new(cache_cap, ".".to_string(), use_cache),
                 router.clone(),
                 port,
                 addr,

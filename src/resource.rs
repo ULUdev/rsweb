@@ -5,26 +5,26 @@ use std::io::Read;
 use std::path::Path;
 use std::time::SystemTime;
 
-/// a ressource loader and cacher
+/// a resource loader and cacher
 #[derive(Clone)]
-pub struct RessourceLoader {
-    ressource_cache: HashMap<String, Ressource>,
-    ressource_root: String,
+pub struct ResourceLoader {
+    resource_cache: HashMap<String, Resource>,
+    resource_root: String,
     use_cache: bool,
 }
 
-/// a ressource loaded by the ressource loader
+/// a resource loaded by the resource loader
 #[derive(Clone)]
-pub struct Ressource {
+pub struct Resource {
     content: String,
     path: String,
     accessed: SystemTime,
     mime_type: MimeType,
 }
 
-impl Ressource {
-    /// load a new ressource
-    pub fn load(path: String) -> std::io::Result<Ressource> {
+impl Resource {
+    /// load a new resource
+    pub fn load(path: String) -> std::io::Result<Resource> {
         let mime_type: MimeType = match Path::new(&path).extension() {
             Some(n) => match n.to_str().unwrap_or("") {
                 "html" | "htm" => MimeType::Html,
@@ -50,7 +50,7 @@ impl Ressource {
         }
         let accessed = SystemTime::now();
 
-        Ok(Ressource {
+        Ok(Resource {
             content,
             path,
             accessed,
@@ -58,7 +58,7 @@ impl Ressource {
         })
     }
 
-    /// get the content of a ressource
+    /// get the content of a resource
     pub fn get_content(&self) -> String {
         self.content.clone()
     }
@@ -68,30 +68,30 @@ impl Ressource {
         self.accessed.clone()
     }
 
-    /// get the path where the ressource is located
+    /// get the path where the resource is located
     pub fn get_path(&self) -> String {
         self.path.clone()
     }
 
-    /// get the mime type of the ressource
+    /// get the mime type of the resource
     pub fn get_mime(&self) -> MimeType {
         self.mime_type.clone()
     }
 }
 
-impl RessourceLoader {
-    /// create a new RessourceLoader with a specified capacity and ressource root
-    pub fn new(capacity: usize, root: String, use_cache: bool) -> RessourceLoader {
-        RessourceLoader {
-            ressource_cache: HashMap::with_capacity(capacity),
-            ressource_root: root,
+impl ResourceLoader {
+    /// create a new ResourceLoader with a specified capacity and resource root
+    pub fn new(capacity: usize, root: String, use_cache: bool) -> ResourceLoader {
+        ResourceLoader {
+            resource_cache: HashMap::with_capacity(capacity),
+            resource_root: root,
             use_cache,
         }
     }
 
     /// load a resource from cache or file system
     /// # Arguments
-    /// `path`: the path relative to the ressource root to look for ressources
+    /// `path`: the path relative to the resource root to look for resources
     pub fn load(&mut self, path: String) -> (String, MimeType) {
         let mime_type: MimeType = match Path::new(&path).extension() {
             Some(n) => match n.to_str().unwrap_or("") {
@@ -107,19 +107,19 @@ impl RessourceLoader {
             None => MimeType::Plaintext,
         };
         if self.use_cache {
-            if let Some(n) = self.ressource_cache.clone().get(&path) {
+            if let Some(n) = self.resource_cache.clone().get(&path) {
                 if let Ok(md) = metadata(path.as_str()) {
                     if let Ok(time) = md.modified() {
                         if let Ok(elapsed) = time.elapsed() {
                             if let Ok(res_elapsed) = n.get_accessed().elapsed() {
                                 if elapsed < res_elapsed {
-                                    let new = match Ressource::load(path.clone()) {
+                                    let new = match Resource::load(path.clone()) {
                                         Ok(n) => n,
                                         Err(_) => {
                                             return (String::new(), MimeType::Other(String::new()));
                                         }
                                     };
-                                    let _ = self.ressource_cache.insert(path, new);
+                                    let _ = self.resource_cache.insert(path, new);
                                 }
                             }
                         }
@@ -146,16 +146,16 @@ impl RessourceLoader {
         }
     }
 
-    /// load a ressource into cache
+    /// load a resource into cache
     /// # Arguments
-    /// `path`: the path relative to the ressource root to look for ressources
+    /// `path`: the path relative to the resource root to look for resources
     pub fn preload(&mut self, path: String) -> String {
         if !self.use_cache {
             return String::new();
         }
         let p = Path::new(path.as_str());
-        //let p = p.join(Path::new(self.ressource_root.as_str()));
-        let p = Path::new(self.ressource_root.as_str()).join(p);
+        //let p = p.join(Path::new(self.resource_root.as_str()));
+        let p = Path::new(self.resource_root.as_str()).join(p);
         if !p.exists() {
             return String::new();
         }

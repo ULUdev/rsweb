@@ -7,10 +7,10 @@ pub struct Config {
     pub port: usize,
     pub ip: String,
     pub threads: Option<usize>,
-    pub ressources: Ressource,
+    pub resources: Resource,
     pub ssl: Option<SslConfig>,
     pub logfile: Option<String>,
-    pub ressource_cache: Option<bool>,
+    pub resource_cache: Option<bool>,
     pub cache_capacity: Option<usize>,
 }
 
@@ -21,7 +21,7 @@ pub struct SslConfig {
 }
 
 #[derive(Deserialize)]
-pub struct Ressource {
+pub struct Resource {
     pub root: String,
     pub index: Option<String>,
     pub routes: Option<Vec<String>>,

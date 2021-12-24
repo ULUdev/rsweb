@@ -1,4 +1,4 @@
-all: container target/release/rsweb-bin
+all: target/release/rsweb-bin container
 
 target/release/rsweb-bin:
 	cargo build --release

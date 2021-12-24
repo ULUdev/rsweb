@@ -3,7 +3,7 @@ use crate::http::request::HTTPRequest;
 use crate::http::response::HTTPResponse;
 use crate::http::*;
 use crate::log;
-use crate::ressource::RessourceLoader;
+use crate::resource::ResourceLoader;
 use crate::route::*;
 use crate::ThreadPool;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
@@ -12,10 +12,10 @@ use std::net::IpAddr;
 use std::net::TcpListener;
 use std::sync::Arc;
 
-/// an SSL/TLS server using a ressource loader and router
+/// an SSL/TLS server using a resource loader and router
 pub struct SSLServer {
     tp: ThreadPool,
-    rl: RessourceLoader,
+    rl: ResourceLoader,
     port: usize,
     ip: IpAddr,
     router: Router,
@@ -25,7 +25,7 @@ pub struct SSLServer {
 impl SSLServer {
     pub fn new(
         capacity: usize,
-        rl: RessourceLoader,
+        rl: ResourceLoader,
         router: Router,
         port: usize,
         ip: IpAddr,

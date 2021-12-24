@@ -3,13 +3,13 @@
 //! To create a simple server just use the following code:
 //! ```rust
 //!
-//! use rsweb::ressource::RessourceLoader;
+//! use rsweb::resource::ResourceLoader;
 //! use rsweb::route::Router;
 //! use rsweb::server::Server;
 //!
 //! let mut server = Server::new(
 //!     10, // number of threads
-//!     RessourceLoader::new(10, ".".to_string()), // create a new ressource loader with capacity 10
+//!     ResourceLoader::new(10, ".".to_string()), // create a new resource loader with capacity 10
 //!     Router::new(String::from("/index.html")), // create a new router with index at index.html
 //!     8080, // port
 //!     std::net::IpAddr::V4(std::net::Ipv4Addr::new(127,0,0,1)), // ip (localhost in this case)
@@ -18,13 +18,13 @@
 //!
 //! `rsweb` also supports ssl. To create a simple server that uses ssl use:
 //! ```rust
-//! use rsweb::ressource::RessourceLoader;
+//! use rsweb::resource::ResourceLoader;
 //! use rsweb::route::Router;
 //! use rsweb::ssl::SSLServer
 //!
 //! let mut server = SSLServer::new(
 //!     10, // number of threads
-//!     RessourceLoader::new(10, ".".to_string()), // create a new ressource loader with capacity 10
+//!     ResourceLoader::new(10, ".".to_string()), // create a new resource loader with capacity 10
 //!     Router::new(String::from("/index.html")), // create a new router with index at index.html
 //!     8080, // port
 //!     std::net::IpAddr::V4(std::net::Ipv4Addr::new(127,0,0,1)), // ip (localhost in this case)
@@ -37,7 +37,7 @@ pub mod config;
 pub mod error;
 pub mod http;
 pub mod log;
-pub mod ressource;
+pub mod resource;
 pub mod route;
 pub mod server;
 pub mod ssl;

@@ -1,16 +1,16 @@
 use crate::http::{body::*, header::*, request::*, response::*, StatusCode};
 use crate::log;
-use crate::ressource::RessourceLoader;
+use crate::resource::ResourceLoader;
 use crate::route::*;
 use crate::ThreadPool;
 use std::io::{Read, Write};
 use std::net::IpAddr;
 use std::net::TcpListener;
 
-/// a rsweb server using a ressource loader and router
+/// a rsweb server using a resource loader and router
 pub struct Server {
     tp: ThreadPool,
-    rl: RessourceLoader,
+    rl: ResourceLoader,
     port: usize,
     ip: IpAddr,
     router: Router,
@@ -20,13 +20,13 @@ impl Server {
     /// create a new server
     /// # Arguments
     /// * `capacity`: the amount of threads to use
-    /// * `rl`: the ressource loader to use
+    /// * `rl`: the resource loader to use
     /// * `router`: the router to use
     /// * `port`: the port to use
     /// * `ip`: the ip address to run on
     pub fn new(
         capacity: usize,
-        rl: RessourceLoader,
+        rl: ResourceLoader,
         router: Router,
         port: usize,
         ip: IpAddr,
