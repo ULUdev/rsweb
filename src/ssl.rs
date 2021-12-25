@@ -6,6 +6,7 @@ use crate::log;
 use crate::resource::ResourceLoader;
 use crate::route::*;
 use crate::ThreadPool;
+use crate::dbuffer::DBuffer;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use std::io::Write;
 use std::net::IpAddr;
@@ -103,7 +104,7 @@ impl SSLServer {
                         let mut logging = log::Logger::new();
                         logging.set_term(btui::Terminal::new());
                         let _ = logging.set_logfile(logfile.as_str());
-                        let mut buf = [0u8; 1024];
+                        let mut buf = DBuffer::new();
                         let mut stream = match acceptor.accept(stream) {
                             Ok(n) => n,
                             Err(_) => {
@@ -111,14 +112,16 @@ impl SSLServer {
                                 return;
                             }
                         };
-                        match stream.ssl_read(&mut buf) {
-                            Ok(_) => (),
+                        if let Err(_) = buf.read_until_req_end(&mut stream) {
+                            logging.log("failed to read from stream", log::LogType::Error);
+                        }
+                        let data: String = match buf.to_string() {
+                            Ok(n) => n,
                             Err(_) => {
-                                logging.log("failed to read from SSL stream", log::LogType::Error);
-                                return;
+                                logging.log("failed to parse data to utf8", log::LogType::Error);
+                                String::new()
                             }
                         };
-                        let data: String = String::from(std::str::from_utf8(&buf).unwrap());
                         if let Ok(req) = HTTPRequest::from_string(data) {
                             logging.log(
                                 format!("request: {} {}", req.get_method(), req.get_path()),

@@ -3,7 +3,8 @@ use crate::log;
 use crate::resource::ResourceLoader;
 use crate::route::*;
 use crate::ThreadPool;
-use std::io::{Read, Write};
+use crate::dbuffer::DBuffer;
+use std::io::Write;
 use std::net::IpAddr;
 use std::net::TcpListener;
 
@@ -79,9 +80,17 @@ impl Server {
                         let mut logging = log::Logger::new();
                         logging.set_term(btui::Terminal::new());
                         let _ = logging.set_logfile(logfile.as_str());
-                        let mut buf = [0u8; 1024];
-                        let _ = stream.read(&mut buf);
-                        let data: String = String::from(std::str::from_utf8(&buf).unwrap());
+                        let mut buf = DBuffer::new();
+                        if let Err(_) = buf.read_until_req_end(&mut stream) {
+                            logging.log("failed to read from stream", log::LogType::Error);
+                        }
+                        let data: String = match buf.to_string() {
+                            Ok(n) => n,
+                            Err(_) => {
+                                logging.log("failed to parse data to utf8", log::LogType::Error);
+                                String::new()
+                            }
+                        };
                         if let Ok(req) = HTTPRequest::from_string(data) {
                             logging.log(
                                 format!("request: {} {}", req.get_method(), req.get_path()),
