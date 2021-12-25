@@ -3,7 +3,7 @@
 
 ## Installation
 `rsweb` has a docker image `uludev/rsweb:latest` which will run an `x86_64` executable.
-It expects a configuration file to be in `/etc/rsweb/rsweb.config.toml`.
+It expects a configuration file to be in `/etc/rsweb/rsweb.config.toml` and it will log to `/var/log/rsweb/latest.log`.
 
 ## Configuration
 An example configuration looks like this:
@@ -13,7 +13,7 @@ port = 8080
 ip = "127.0.0.1"
 threads = 10
 logfile = "log.txt"
-[ressources]
+[resources]
 root = "."
 index = "/test.html"
 aliases = ["/test:/test.html"]
@@ -26,7 +26,7 @@ port = 8080
 ip = "127.0.0.1"
 threads = 10
 logfile = "log.txt"
-[ressources]
+[resources]
 root = "."
 index = "/test.html"
 aliases = ["/test:/test.html"]

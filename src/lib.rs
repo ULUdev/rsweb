@@ -42,8 +42,10 @@ pub mod route;
 pub mod server;
 pub mod ssl;
 pub mod tp;
+pub mod cli;
 
 pub use tp::ThreadPool;
+pub const RSWEB_VERSION: &str = "0.5.4";
 
 #[cfg(test)]
 mod tests {

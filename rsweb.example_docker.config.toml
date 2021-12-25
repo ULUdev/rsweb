@@ -5,3 +5,6 @@ threads = 10
 root = "/rsweb"
 index = "/test.html"
 aliases = ["/test:/test.html"]
+[ssl]
+private_key = "/rsweb/privkey.pem"
+certificate_chain = "/rsweb/certs.pem"

@@ -187,6 +187,8 @@ impl SSLServer {
                                     }
                                 }
                             }
+                        } else {
+                            logging.log("failed to parse request", log::LogType::Error);
                         }
                         match stream.shutdown() {
                             Ok(_) => (),

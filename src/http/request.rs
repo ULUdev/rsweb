@@ -40,7 +40,12 @@ impl HTTPRequest {
     }
 
     pub fn from_string(req_string: String) -> Result<HTTPRequest, HTTPRequestParsingError> {
-        let line1: String = req_string.lines().next().unwrap().to_string();
+        let line1: String = match req_string.lines().next() {
+            Some(n) => n.to_string(),
+            None => {
+                return Err(HTTPRequestParsingError);
+            }
+        };
         let mut line1_iter = line1.split_whitespace();
         let method: &str = match line1_iter.next() {
             Some(n) => n,

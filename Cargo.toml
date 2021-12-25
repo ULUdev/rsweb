@@ -1,6 +1,6 @@
 [package]
 name = "rsweb"
-version = "0.5.3"
+version = "0.5.4"
 edition = "2021"
 authors = ["Moritz Sokoll <moritz@sokoll.com>"]
 license = "MIT"

@@ -7,6 +7,7 @@ use chrono::prelude::*;
 use std::fs::File;
 use std::fs::OpenOptions;
 use std::io::Write;
+use std::path::Path;
 
 /// the type of log
 pub enum LogType {
@@ -34,6 +35,14 @@ impl Logger {
     /// # Returns
     /// A result that is an error variant if the file opening process fails
     pub fn set_logfile(&mut self, fname: &str) -> Result<(), std::io::Error> {
+        let path = Path::new(fname);
+        if let Some(parent) = path.parent() {
+            if !parent.exists() {
+                if let Err(e) = std::fs::create_dir_all(parent) {
+                    return Err(e);
+                }
+            }
+        }
         self.file = match OpenOptions::new().append(true).create(true).open(fname) {
             Ok(n) => Some(n),
             Err(e) => {

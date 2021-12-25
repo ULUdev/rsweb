@@ -3,17 +3,14 @@ use rsweb::resource::ResourceLoader;
 use rsweb::route::Router;
 use rsweb::server::Server;
 use rsweb::ssl::SSLServer;
-use std::env::args;
+use rsweb::cli::Arguments;
 use std::process::exit;
 use std::str::FromStr;
 
 fn main() {
-    let arguments: Vec<String> = args().collect();
-    let mut path: &str = "/etc/rsweb/rsweb.config.toml";
-    if arguments.len() >= 2 {
-        path = arguments[1].as_str();
-    }
-    let conf: Config = match load_config(path) {
+    let arguments = Arguments::load();
+    let path: String = arguments.configfile.unwrap_or_else(|| String::from("/etc/rsweb/rsweb.config.toml"));
+    let conf: Config = match load_config(&path) {
         Ok(n) => n,
         Err(_) => {
             eprintln!("failed to parse config file. Exiting...");
@@ -27,7 +24,7 @@ fn main() {
     let mut router = Router::new(index_page);
     let threads: usize = conf.threads.unwrap_or(4);
     let port: usize = conf.port;
-    let logfile: String = conf.logfile.unwrap_or_else(|| String::from("log.txt"));
+    let logfile: String = conf.logfile.unwrap_or_else(|| String::from("/var/log/rsweb/latest.log"));
     let use_cache: bool = conf.resource_cache.unwrap_or(true);
     let cache_cap: usize = conf.cache_capacity.unwrap_or(10);
     let routes: Vec<(String, String)> = conf

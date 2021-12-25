@@ -155,6 +155,8 @@ impl Server {
                                     }
                                 }
                             }
+                        } else {
+                            logging.log("failed to parse request", log::LogType::Error);
                         }
                         match stream.shutdown(std::net::Shutdown::Both) {
                             Ok(_) => (),
