@@ -9,12 +9,16 @@ impl Arguments {
     /// load arguments
     pub fn load() -> Arguments {
         let mut arguments = args();
-        let mut out = Arguments { logfile: None, configfile: None };
+        let mut out = Arguments {
+            logfile: None,
+            configfile: None,
+        };
         loop {
             if let Some(n) = arguments.next() {
                 match n.as_str() {
                     "-h" | "--help" => {
-                        eprintln!("
+                        eprintln!(
+                            "
 USAGE
   rsweb [OPTIONS]
 
@@ -23,7 +27,8 @@ OPTIONS
   -l,--logfile <logfile>: log to <logfile> instead of default or configured logfile
   -c,--config <config>: use <config> as a config file instead of default
   -v,--version: print the version and exit
-                            ");
+                            "
+                        );
                         std::process::exit(0);
                     }
                     "-l" | "--logfile" => {

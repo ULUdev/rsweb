@@ -1,3 +1,4 @@
+use crate::dbuffer::DBuffer;
 use crate::error::ServerError;
 use crate::http::request::HTTPRequest;
 use crate::http::response::HTTPResponse;
@@ -6,7 +7,6 @@ use crate::log;
 use crate::resource::ResourceLoader;
 use crate::route::*;
 use crate::ThreadPool;
-use crate::dbuffer::DBuffer;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use std::io::Write;
 use std::net::IpAddr;

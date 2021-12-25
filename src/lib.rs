@@ -33,7 +33,9 @@
 //! );
 //! ```
 
+pub mod cli;
 pub mod config;
+pub mod dbuffer;
 pub mod error;
 pub mod http;
 pub mod log;
@@ -42,8 +44,6 @@ pub mod route;
 pub mod server;
 pub mod ssl;
 pub mod tp;
-pub mod cli;
-pub mod dbuffer;
 
 pub use tp::ThreadPool;
 pub const RSWEB_VERSION: &str = "0.5.5";
