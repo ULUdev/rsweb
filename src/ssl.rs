@@ -90,7 +90,9 @@ impl SSLServer {
         };
         let mut logger = log::Logger::new();
         logger.set_term(btui::Terminal::default());
-        let _ = logger.set_logfile(lf);
+        if let Err(e) = logger.set_logfile(lf) {
+            logger.log("couldn't open log file", log::LogType::Error);
+        }
         logger.log("starting server", log::LogType::Log);
         for stream in listener.incoming() {
             match stream {
@@ -112,7 +114,7 @@ impl SSLServer {
                                 return;
                             }
                         };
-                        if let Err(_) = buf.read_until_req_end(&mut stream) {
+                        if let Err(_) = buf.read_http_request(&mut stream) {
                             logging.log("failed to read from stream", log::LogType::Error);
                         }
                         let data: String = match buf.to_string() {

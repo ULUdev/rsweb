@@ -33,16 +33,35 @@
 //! );
 //! ```
 
+/// the cli of `rsweb`
 pub mod cli;
+
+/// the configuration reading functionality of `rsweb`
 pub mod config;
+
+/// a dynamic buffer implementation used to read from streams
 pub mod dbuffer;
+
+/// errors for `rsweb`
 pub mod error;
 pub mod http;
+
+/// logging functions for `rsweb`
 pub mod log;
+
+/// resource handler and cache storage
 pub mod resource;
+
+/// router for requests
 pub mod route;
+
+/// basic HTTP server implementation
 pub mod server;
+
+/// basic HTTPS server implementation
 pub mod ssl;
+
+/// Threadpool implementation included in the logs produced by [`log`]
 pub mod tp;
 
 pub use tp::ThreadPool;

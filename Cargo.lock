@@ -144,7 +144,7 @@ dependencies = [
 
 [[package]]
 name = "rsweb"
-version = "0.5.5"
+version = "0.6.5"
 dependencies = [
  "btui",
  "chrono",

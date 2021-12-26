@@ -1,4 +1,4 @@
-use crate::http::header::Header;
+use crate::http::Header;
 use crate::http::response::HTTPResponse;
 use crate::http::Body;
 use crate::http::StatusCode;

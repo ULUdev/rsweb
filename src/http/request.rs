@@ -1,3 +1,5 @@
+use super::header::HTTPRequestHeaders;
+
 #[derive(Debug)]
 pub struct HTTPRequestParsingError;
 
@@ -31,16 +33,20 @@ impl std::fmt::Display for HTTPMethod {
 pub struct HTTPRequest {
     method: HTTPMethod,
     path: String,
+    header: Vec<HTTPRequestHeaders>,
+    body: Option<String>
 }
 
 impl HTTPRequest {
     /// construct a new HTTP request
-    pub fn new(method: HTTPMethod, path: String) -> HTTPRequest {
-        HTTPRequest { method, path }
+    pub fn new(method: HTTPMethod, path: String, header: Vec<HTTPRequestHeaders>, body: Option<String>) -> HTTPRequest {
+        // TODO: proper reading of header from arguments
+        HTTPRequest { method, path, body, header }
     }
 
     pub fn from_string(req_string: String) -> Result<HTTPRequest, HTTPRequestParsingError> {
-        let line1: String = match req_string.lines().next() {
+        let mut lines = req_string.lines();
+        let line1: String = match lines.next() {
             Some(n) => n.to_string(),
             None => {
                 return Err(HTTPRequestParsingError);
@@ -67,7 +73,17 @@ impl HTTPRequest {
                 return Err(HTTPRequestParsingError);
             }
         };
-        Ok(HTTPRequest::new(method, path.to_string()))
+        let mut out_headers: Vec<HTTPRequestHeaders> = Vec::new();
+        for line in req_string.lines().skip(1) {
+            if let Some(n) = HTTPRequestHeaders::from_string(line.to_string()) {
+                out_headers.push(n);
+            }
+        }
+        let body: Option<String> = match path.split("\r\n\r\n").nth(1) {
+            Some(n) => Some(n.to_string()),
+            None => None,
+        };
+        Ok(HTTPRequest::new(method, path.to_string(), out_headers, body))
     }
 
     /// get the path
@@ -78,5 +94,10 @@ impl HTTPRequest {
     /// get the method
     pub fn get_method(&self) -> HTTPMethod {
         self.method.clone()
+    }
+
+    /// get the header
+    pub fn get_header(&self) -> Vec<HTTPRequestHeaders> {
+        self.header.clone()
     }
 }
