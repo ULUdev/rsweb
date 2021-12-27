@@ -16,6 +16,13 @@ impl std::fmt::Display for HTTPRequestParsingError {
 pub enum HTTPMethod {
     Get,
     Post,
+    Head,
+    Delete,
+    Put,
+    Connect,
+    Options,
+    Trace,
+    Patch,
 }
 
 impl std::fmt::Display for HTTPMethod {
@@ -23,6 +30,13 @@ impl std::fmt::Display for HTTPMethod {
         let string = match self {
             HTTPMethod::Get => String::from("GET"),
             HTTPMethod::Post => String::from("POST"),
+            HTTPMethod::Head => String::from("HEAD"),
+            HTTPMethod::Delete => String::from("DELETE"),
+            HTTPMethod::Put => String::from("PUT"),
+            HTTPMethod::Connect => String::from("CONNECT"),
+            HTTPMethod::Options => String::from("OPTIONS"),
+            HTTPMethod::Trace => String::from("TRACE"),
+            HTTPMethod::Patch => String::from("PATCH"),
         };
         write!(f, "{}", string)
     }
@@ -34,14 +48,24 @@ pub struct HTTPRequest {
     method: HTTPMethod,
     path: String,
     header: Vec<HTTPRequestHeaders>,
-    body: Option<String>
+    body: Option<String>,
 }
 
 impl HTTPRequest {
     /// construct a new HTTP request
-    pub fn new(method: HTTPMethod, path: String, header: Vec<HTTPRequestHeaders>, body: Option<String>) -> HTTPRequest {
+    pub fn new(
+        method: HTTPMethod,
+        path: String,
+        header: Vec<HTTPRequestHeaders>,
+        body: Option<String>,
+    ) -> HTTPRequest {
         // TODO: proper reading of header from arguments
-        HTTPRequest { method, path, body, header }
+        HTTPRequest {
+            method,
+            path,
+            body,
+            header,
+        }
     }
 
     pub fn from_string(req_string: String) -> Result<HTTPRequest, HTTPRequestParsingError> {
@@ -69,6 +93,13 @@ impl HTTPRequest {
         let method: HTTPMethod = match method {
             "GET" => HTTPMethod::Get,
             "POST" => HTTPMethod::Post,
+            "HEAD" => HTTPMethod::Head,
+            "DELETE" => HTTPMethod::Delete,
+            "PUT" => HTTPMethod::Put,
+            "CONNECT" => HTTPMethod::Connect,
+            "OPTIONS" => HTTPMethod::Options,
+            "TRACE" => HTTPMethod::Trace,
+            "PATCH" => HTTPMethod::Patch,
             _ => {
                 return Err(HTTPRequestParsingError);
             }
@@ -83,7 +114,12 @@ impl HTTPRequest {
             Some(n) => Some(n.to_string()),
             None => None,
         };
-        Ok(HTTPRequest::new(method, path.to_string(), out_headers, body))
+        Ok(HTTPRequest::new(
+            method,
+            path.to_string(),
+            out_headers,
+            body,
+        ))
     }
 
     /// get the path

@@ -9,7 +9,8 @@
 //!
 //! let mut server = Server::new(
 //!     10, // number of threads
-//!     ResourceLoader::new(10, ".".to_string()), // create a new resource loader with capacity 10
+//!     ResourceLoader::new(10, ".".to_string(), true), // create a new resource loader with capacity 10
+//!     // and caching enabled
 //!     Router::new(String::from("/index.html")), // create a new router with index at index.html
 //!     8080, // port
 //!     std::net::IpAddr::V4(std::net::Ipv4Addr::new(127,0,0,1)), // ip (localhost in this case)
@@ -20,11 +21,11 @@
 //! ```rust
 //! use rsweb::resource::ResourceLoader;
 //! use rsweb::route::Router;
-//! use rsweb::ssl::SSLServer
+//! use rsweb::ssl::SSLServer;
 //!
 //! let mut server = SSLServer::new(
 //!     10, // number of threads
-//!     ResourceLoader::new(10, ".".to_string()), // create a new resource loader with capacity 10
+//!     ResourceLoader::new(10, ".".to_string(), true), // create a new resource loader with capacity 10 and caching enabled
 //!     Router::new(String::from("/index.html")), // create a new router with index at index.html
 //!     8080, // port
 //!     std::net::IpAddr::V4(std::net::Ipv4Addr::new(127,0,0,1)), // ip (localhost in this case)
@@ -65,7 +66,10 @@ pub mod ssl;
 pub mod tp;
 
 pub use tp::ThreadPool;
-pub const RSWEB_VERSION: &str = "0.5.5";
+/// version str of rsweb. Used for logging and CLI
+pub const RSWEB_VERSION: &str = "0.7.5";
+/// version str of rsweb used in the `Server` response header
+pub const RSWEB_SERVER_STR: &str = "rsweb/0.7.5";
 
 #[cfg(test)]
 mod tests {

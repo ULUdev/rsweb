@@ -1,9 +1,13 @@
-use super::StatusCode;
-use super::MimeType;
 use super::cookie::Cookie;
+use super::MimeType;
+use super::StatusCode;
 
 /// an http response header
 #[derive(Clone, Debug)]
+#[deprecated(
+    since = "0.7.5",
+    note = "use `HTTPResponseHeaders` instead. This struct is of no use anymore and will be removed later on"
+)]
 pub struct HTTPResponseHeader {
     status: StatusCode,
     kv_pairs: Vec<String>,
@@ -43,15 +47,123 @@ impl HTTPResponseHeader {
 }
 
 #[derive(Clone, Debug)]
-pub enum HTTPResponseHeaders {
-    ContentType(MimeType),
-    ContentLength(usize),
-    Server(String),
-    SetCookie(Cookie),
-    Location(String),
+// TODO: flate2 crate sounds interesting for implementing compression and decompression
+// brotli crate for brotli compression algorithm
+/// encoding method for content
+pub enum ContentEncodingMethod {
+    /// gzip compression (Lempel-Ziv coding)
+    Gzip,
+
+    /// Lempel-Ziv-Welch compression
+    Compress,
+
+    /// deflate compression algorithm (RFC 1951) of the zlib structure (RFC 1950)
+    Deflate,
+
+    /// Brotli compression algorithm
+    Br,
+}
+
+impl ContentEncodingMethod {
+    pub fn from_string(string: String) -> Option<ContentEncodingMethod> {
+        match string.as_str() {
+            "gzip" => Some(ContentEncodingMethod::Gzip),
+            "compress" => Some(ContentEncodingMethod::Compress),
+            "deflate" => Some(ContentEncodingMethod::Deflate),
+            "br" => Some(ContentEncodingMethod::Br),
+            _ => None,
+        }
+    }
+
+    pub fn to_string(&self) -> String {
+        match self {
+            ContentEncodingMethod::Gzip => String::from("gzip"),
+            ContentEncodingMethod::Compress => String::from("compress"),
+            ContentEncodingMethod::Deflate => String::from("deflate"),
+            ContentEncodingMethod::Br => String::from("br"),
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
+/// enum representing supported http response headers
+pub enum HTTPResponseHeaders {
+    ContentType(MimeType),
+    ContentLength(usize),
+    ContentEncoding(ContentEncodingMethod),
+    Server(String),
+    SetCookie(Cookie),
+    Location(String),
+    AccessControlAllowOrigin(String),
+}
+
+impl HTTPResponseHeaders {
+    /// read the header from a string
+    pub fn from_string(string: String) -> Option<HTTPResponseHeaders> {
+        let mut parts = string.split(':').map(|x| x.trim_end().trim_start());
+        let left: &str = match parts.next() {
+            Some(n) => n,
+            None => return None,
+        };
+        let right: &str = match parts.next() {
+            Some(n) => n,
+            None => return None,
+        };
+        match left {
+            "Content-Type" => {
+                if let Some(n) = MimeType::from_string(right.to_string()) {
+                    Some(HTTPResponseHeaders::ContentType(n))
+                } else {
+                    None
+                }
+            }
+            "Content-Length" => {
+                if let Err(_) = right.parse::<usize>() {
+                    None
+                } else {
+                    Some(HTTPResponseHeaders::ContentLength(right.parse().unwrap()))
+                }
+            }
+            "Content-Encoding" => {
+                if let Some(n) = ContentEncodingMethod::from_string(right.to_string()) {
+                    Some(HTTPResponseHeaders::ContentEncoding(n))
+                } else {
+                    None
+                }
+            }
+            "Server" => Some(HTTPResponseHeaders::Server(right.to_string())),
+            "Set-Cookie" => match Cookie::from_string(right.to_string()) {
+                Some(n) => Some(HTTPResponseHeaders::SetCookie(n)),
+                None => None,
+            },
+            "Location" => Some(HTTPResponseHeaders::Location(right.to_string())),
+            "Access-Control-Allow-Origin" => Some(HTTPResponseHeaders::AccessControlAllowOrigin(
+                right.to_string(),
+            )),
+            _ => None,
+        }
+    }
+
+    /// convert a HTTPResponseHeaders instance to a string
+    pub fn to_string(&self) -> String {
+        match self {
+            HTTPResponseHeaders::ContentType(n) => format!("Content-Type: {}", n.to_string()),
+            HTTPResponseHeaders::ContentLength(n) => format!("Content-Length: {}", n),
+            HTTPResponseHeaders::ContentEncoding(n) => {
+                format!("Content-Encoding: {}", n.to_string())
+            }
+            HTTPResponseHeaders::Server(n) => format!("Server: {}", n),
+            HTTPResponseHeaders::SetCookie(n) => format!("Set-Cookie: {}", n.to_string()),
+            HTTPResponseHeaders::Location(n) => format!("Location: {}", n),
+            HTTPResponseHeaders::AccessControlAllowOrigin(n) => {
+                format!("Access-Control-Allow-Origin: {}", n)
+            }
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+/// enum representing supported http request headers
 pub enum HTTPRequestHeaders {
     ContentLength(usize),
     ContentType(MimeType),
@@ -62,7 +174,6 @@ pub enum HTTPRequestHeaders {
 }
 
 impl HTTPRequestHeaders {
-    
     pub fn from_string(string: String) -> Option<HTTPRequestHeaders> {
         let mut parts = string.split(':');
         let key = match parts.next() {
@@ -100,9 +211,7 @@ impl HTTPRequestHeaders {
                     return None;
                 }
             }
-            "User-Agent" => {
-                Some(HTTPRequestHeaders::UserAgent(value.to_string()))
-            }
+            "User-Agent" => Some(HTTPRequestHeaders::UserAgent(value.to_string())),
             "Cookie" => {
                 let parts: Vec<String> = value.split("; ").map(|x| x.to_string()).collect();
                 let mut cookies: Vec<Cookie> = Vec::new();
@@ -113,9 +222,7 @@ impl HTTPRequestHeaders {
                 }
                 Some(HTTPRequestHeaders::Cookie(cookies))
             }
-            "Host" => {
-                Some(HTTPRequestHeaders::Host(value.to_string()))
-            }
+            "Host" => Some(HTTPRequestHeaders::Host(value.to_string())),
             _ => None,
         }
     }

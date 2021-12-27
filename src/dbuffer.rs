@@ -1,6 +1,6 @@
-use std::io::Read;
-use crate::http::request::HTTPRequest;
 use crate::http::header::HTTPRequestHeaders;
+use crate::http::request::HTTPRequest;
+use std::io::Read;
 
 pub struct DBuffer {
     buffer: Vec<u8>,
@@ -51,12 +51,11 @@ impl DBuffer {
     // Note: chunking might be a solution. Read to a chunk and add the data of that chunk to the
     // buffer. If too large utilize the filesystem
 
-
     /// read from `r` until a HTTP request Header end is met (`\r\n\r\n` or `0xD 0xA 0xD 0xA`)
     ///
     /// # Returns
     /// This function returns a result that if Ok holds the amount of bytes read
-    #[deprecated(since="0.6.5", note="use `read_http_request` instead")]
+    #[deprecated(since = "0.6.5", note = "use `read_http_request` instead")]
     pub fn read_until_req_end<T: Read>(&mut self, r: &mut T) -> std::io::Result<usize> {
         let mut tmp_buf = [0u8];
         let mut counter: usize = 0;
@@ -105,8 +104,7 @@ impl DBuffer {
                     }
                     if tmp_buf[0] == 13 {
                         cr = true;
-                    }
-                    else if cr && tmp_buf[0] == 10 {
+                    } else if cr && tmp_buf[0] == 10 {
                         crlf_counter += 1;
                     } else {
                         crlf_counter = 0;
@@ -126,13 +124,19 @@ impl DBuffer {
         let string = match self.to_string() {
             Ok(n) => n,
             Err(_) => {
-                return Err(std::io::Error::new(std::io::ErrorKind::Other, "failed to convert bytes to string"));
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "failed to convert bytes to string",
+                ));
             }
         };
         let request = match HTTPRequest::from_string(string) {
             Ok(n) => n,
             Err(_) => {
-                return Err(std::io::Error::new(std::io::ErrorKind::Other, "failed to parse header of HTTP request"));
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "failed to parse header of HTTP request",
+                ));
             }
         };
         let header: Vec<HTTPRequestHeaders> = request.get_header();
@@ -157,7 +161,6 @@ impl DBuffer {
                         }
                         self.buffer.push(buf[0]);
                         bytes_read += 1;
-
                     }
                     Err(_) => {
                         break;
@@ -166,7 +169,6 @@ impl DBuffer {
             }
             return Ok(header_size + bytes_read);
         }
-
     }
 
     /// try to convert the internal buffer to a string

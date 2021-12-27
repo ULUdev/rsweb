@@ -6,3 +6,4 @@ logfile = "log.txt"
 root = "."
 index = "/test.html"
 aliases = ["/test:/test.html"]
+routes = ["/route:/index.html"]

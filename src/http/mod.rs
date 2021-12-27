@@ -1,10 +1,10 @@
 //! # HTTP
 //! module containing functions to parse the http protocol
 pub mod body;
+pub mod cookie;
 pub mod header;
 pub mod request;
 pub mod response;
-pub mod cookie;
 
 /// enum for supported http status codes
 #[derive(Clone, Debug)]
@@ -13,6 +13,18 @@ pub enum StatusCode {
     NotFound,
     InternalServerError,
     MovedPermanently,
+}
+
+impl StatusCode {
+    /// convert an HTTP status code to a string
+    pub fn to_string(&self) -> String {
+        match self {
+            StatusCode::Ok => String::from("HTTP/1.1 200 OK"),
+            StatusCode::NotFound => String::from("HTTP/1.1 404 NOT FOUND"),
+            StatusCode::InternalServerError => String::from("HTTP/1.1 500 INTERNAL SERVER ERROR"),
+            StatusCode::MovedPermanently => String::from("HTTP/1.1 301 MOVED PERMANENTLY"),
+        }
+    }
 }
 
 /// enum for supported mime types
@@ -28,11 +40,10 @@ pub enum MimeType {
     MultipartFormData,
     WWWFormUrlencoded,
     Other(String),
-    Wildcard(String, String)
+    Wildcard(String, String),
 }
 
 impl MimeType {
-    
     /// make a MimeType from a string and return `None` if it is a non recognizable MimeType
     pub fn from_string(string: String) -> Option<MimeType> {
         match string.as_str() {
@@ -86,5 +97,5 @@ impl MimeType {
 
 pub use body::Body;
 pub use header::HTTPResponseHeader;
-#[deprecated(since = "0.6.5", note="use `HTTPResponseHeader` type instead")]
+#[deprecated(since = "0.6.5", note = "use `HTTPResponseHeader` type instead")]
 pub type Header = HTTPResponseHeader;
