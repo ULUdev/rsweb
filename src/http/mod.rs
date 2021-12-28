@@ -7,7 +7,7 @@ pub mod request;
 pub mod response;
 
 /// enum for supported http status codes
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum StatusCode {
     Ok,
     NotFound,
@@ -28,7 +28,7 @@ impl StatusCode {
 }
 
 /// enum for supported mime types
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum MimeType {
     Html,
     Javascript,

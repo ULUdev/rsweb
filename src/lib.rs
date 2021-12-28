@@ -67,9 +67,9 @@ pub mod tp;
 
 pub use tp::ThreadPool;
 /// version str of rsweb. Used for logging and CLI
-pub const RSWEB_VERSION: &str = "0.7.5";
+pub const RSWEB_VERSION: &str = "0.7.6";
 /// version str of rsweb used in the `Server` response header
-pub const RSWEB_SERVER_STR: &str = "rsweb/0.7.5";
+pub const RSWEB_SERVER_STR: &str = "rsweb/0.7.6";
 
 #[cfg(test)]
 mod tests {

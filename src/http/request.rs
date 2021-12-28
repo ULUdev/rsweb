@@ -12,7 +12,7 @@ impl std::fmt::Display for HTTPRequestParsingError {
 }
 
 /// An HTTP method
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum HTTPMethod {
     Get,
     Post,

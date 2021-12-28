@@ -4,7 +4,9 @@ use crate::http::header::HTTPResponseHeaders;
 use crate::http::request::HTTPRequest;
 use crate::http::response::HTTPResponse;
 use crate::http::MimeType;
-use crate::http::*;
+use crate::http::request::HTTPMethod;
+use crate::http::StatusCode;
+use crate::http::body::Body;
 use crate::log;
 use crate::resource::ResourceLoader;
 use crate::route::*;
@@ -28,6 +30,7 @@ pub struct SSLServer {
 }
 
 impl SSLServer {
+    /// create a new SSL server
     pub fn new(
         capacity: usize,
         rl: ResourceLoader,
@@ -139,35 +142,27 @@ impl SSLServer {
                                     Route::Alias(q) => {
                                         let (response_body, mime_type) =
                                             resload.load(q[1..].to_string());
-                                        let header = vec![
+                                        let mut header = vec![
                                             HTTPResponseHeaders::ContentType(mime_type),
                                             HTTPResponseHeaders::Server(
                                                 RSWEB_SERVER_STR.to_string(),
                                             ),
                                         ];
-                                        let mut response = HTTPResponse::new(
-                                            StatusCode::Ok,
-                                            header,
-                                            Body::new(response_body.clone()),
-                                        );
+                                        let mut status = StatusCode::Ok;
+                                        let mut body = Body::new(response_body.clone());
                                         if response_body.is_empty() {
-                                            response = HTTPResponse::new(
-                                                StatusCode::NotFound,
-                                                vec![
-                                                    HTTPResponseHeaders::ContentType(
-                                                        MimeType::Html,
-                                                    ),
-                                                    HTTPResponseHeaders::Server(
-                                                        RSWEB_SERVER_STR.to_string(),
-                                                    ),
-                                                ],
-                                                Body::new(String::from("<h1>404 not found</h1>")),
-                                            );
+                                            status = StatusCode::NotFound;
+                                            header = vec![HTTPResponseHeaders::ContentType(MimeType::Html), HTTPResponseHeaders::Server(RSWEB_SERVER_STR.to_string())];
+                                            body = Body::new(String::from("<h1>404 not found</h1>"));
                                         }
-                                        response
+                                        header.push(HTTPResponseHeaders::ContentLength(body.get_bytes().len()));
+                                        if req.get_method() == HTTPMethod::Head {
+                                            body = Body::new(String::new());
+                                        }
+                                        HTTPResponse::new(status, header, body)
                                     }
                                 };
-                                match stream.write(resp.to_string().as_str().as_bytes()) {
+                                match stream.write(&resp.to_bytes()) {
                                     Ok(_) => (),
                                     Err(_) => logging
                                         .log("failed to write to stream", log::LogType::Error),
@@ -181,28 +176,23 @@ impl SSLServer {
                             } else {
                                 let (response_body, mime_type) =
                                     resload.load(req.get_path()[1..].to_string());
-                                let header = vec![
+                                let mut header = vec![
                                     HTTPResponseHeaders::ContentType(mime_type),
                                     HTTPResponseHeaders::Server(RSWEB_SERVER_STR.to_string()),
                                 ];
-                                let mut response = HTTPResponse::new(
-                                    StatusCode::Ok,
-                                    header,
-                                    Body::new(response_body.clone()),
-                                );
+                                let mut status = StatusCode::Ok;
+                                let mut body = Body::new(response_body.clone());
                                 if response_body.is_empty() {
-                                    response = HTTPResponse::new(
-                                        StatusCode::NotFound,
-                                        vec![
-                                            HTTPResponseHeaders::ContentType(MimeType::Html),
-                                            HTTPResponseHeaders::Server(
-                                                RSWEB_SERVER_STR.to_string(),
-                                            ),
-                                        ],
-                                        Body::new(String::from("<h1>404 not found</h1>")),
-                                    );
+                                    status = StatusCode::NotFound;
+                                    header = vec![HTTPResponseHeaders::ContentType(MimeType::Html), HTTPResponseHeaders::Server(RSWEB_SERVER_STR.to_string())];
+                                    body = Body::new(String::from("<h1>404 not found</h1>"));
                                 }
-                                match stream.write(response.to_string().as_str().as_bytes()) {
+                                header.push(HTTPResponseHeaders::ContentLength(body.get_bytes().len()));
+                                if req.get_method() == HTTPMethod::Head {
+                                    body = Body::new(String::new());
+                                }
+                                let response = HTTPResponse::new(status, header, body);
+                                match stream.write(&response.to_bytes()) {
                                     Ok(_) => (),
                                     Err(_) => logging
                                         .log("failed to write to stream", log::LogType::Error),
