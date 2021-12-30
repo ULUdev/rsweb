@@ -1,5 +1,5 @@
 /target
 tags
-log.txt
+*log.txt
 test.html
 *.pem

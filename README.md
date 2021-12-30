@@ -8,29 +8,39 @@ It expects a configuration file to be in `/etc/rsweb/rsweb.config.toml` and it w
 ## Configuration
 An example configuration looks like this:
 ```toml
-threads = 10
+[http]
 port = 8080
 ip = "127.0.0.1"
 threads = 10
 logfile = "log.txt"
-[resources]
+[http.resources]
 root = "."
 index = "/test.html"
 aliases = ["/test:/test.html"]
+routes = ["/route:/index.html"]
 ```
 
 ## SSL
 `rsweb` has an SSL implementation. An example configuration using SSL looks like this:
 ```toml
+# optional addition of an http server for compatibility reasons
+[http]
 port = 8080
+ip = "127.0.0.1"
+threads = 1
+logfile = "alternate_log.txt"
+[http.resources]
+root = "."
+routes = ["/*:https://localhost:4343"]
+
+[ssl.resources]
+root = "."
+aliases = ["/test:/test.html", "/:/test.html"]
+[ssl]
+port = 4343
 ip = "127.0.0.1"
 threads = 10
 logfile = "log.txt"
-[resources]
-root = "."
-index = "/test.html"
-aliases = ["/test:/test.html"]
-[ssl]
 private_key = "privkey.pem"
 certificate_chain = "certs.pem"
 ```

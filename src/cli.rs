@@ -13,12 +13,11 @@ impl Arguments {
             logfile: None,
             configfile: None,
         };
-        loop {
-            if let Some(n) = arguments.next() {
-                match n.as_str() {
-                    "-h" | "--help" => {
-                        eprintln!(
-                            "
+        while let Some(n) = arguments.next() {
+            match n.as_str() {
+                "-h" | "--help" => {
+                    eprintln!(
+                        "
 USAGE
   rsweb [OPTIONS]
 
@@ -28,33 +27,30 @@ OPTIONS
   -c,--config <config>: use <config> as a config file instead of default
   -v,--version: print the version and exit
                             "
-                        );
-                        std::process::exit(0);
-                    }
-                    "-l" | "--logfile" => {
-                        if let Some(lf) = arguments.next() {
-                            out.logfile = Some(lf);
-                        } else {
-                            eprintln!("no logfile provided");
-                            std::process::exit(1);
-                        }
-                    }
-                    "-c" | "--config" => {
-                        if let Some(conf) = arguments.next() {
-                            out.configfile = Some(conf);
-                        } else {
-                            eprintln!("no config provided");
-                            std::process::exit(1);
-                        }
-                    }
-                    "-v" | "--version" => {
-                        eprintln!("rsweb: version {}", crate::RSWEB_VERSION);
-                        std::process::exit(0);
-                    }
-                    _ => (),
+                    );
+                    std::process::exit(0);
                 }
-            } else {
-                break;
+                "-l" | "--logfile" => {
+                    if let Some(lf) = arguments.next() {
+                        out.logfile = Some(lf);
+                    } else {
+                        eprintln!("no logfile provided");
+                        std::process::exit(1);
+                    }
+                }
+                "-c" | "--config" => {
+                    if let Some(conf) = arguments.next() {
+                        out.configfile = Some(conf);
+                    } else {
+                        eprintln!("no config provided");
+                        std::process::exit(1);
+                    }
+                }
+                "-v" | "--version" => {
+                    eprintln!("rsweb: version {}", crate::RSWEB_VERSION);
+                    std::process::exit(0);
+                }
+                _ => (),
             }
         }
         out

@@ -63,16 +63,14 @@ impl Logger {
             LogType::Warning => {
                 let cur_time: DateTime<Local> = Local::now();
                 if let Some(n) = &self.term {
-                    match n.eprintln(format!(
+                    let _ = n.eprintln(format!(
                         "[{}]: {}Warning: {}{}{}",
                         cur_time,
                         fg(Color::Yellow),
                         fg(Color::White),
                         msg,
                         sp(Special::Reset)
-                    )) {
-                        _ => (),
-                    }
+                    ));
                 }
                 if let Some(n) = &mut self.file {
                     let _ = n.write(
@@ -86,16 +84,14 @@ impl Logger {
             LogType::Error => {
                 let cur_time: DateTime<Local> = Local::now();
                 if let Some(n) = &self.term {
-                    match n.eprintln(format!(
+                    let _ = n.eprintln(format!(
                         "[{}]: {}Error: {}{}{}",
                         cur_time,
                         fg(Color::Red),
                         fg(Color::White),
                         msg,
                         sp(Special::Reset)
-                    )) {
-                        _ => (),
-                    }
+                    ));
                 }
                 if let Some(n) = &mut self.file {
                     let _ = n.write(
@@ -109,9 +105,7 @@ impl Logger {
             LogType::Log => {
                 let cur_time: DateTime<Local> = Local::now();
                 if let Some(n) = &self.term {
-                    match n.eprintln(format!("[{}]: {}", cur_time, msg)) {
-                        _ => (),
-                    }
+                    let _ = n.eprintln(format!("[{}]: {}", cur_time, msg));
                 }
                 if let Some(n) = &mut self.file {
                     let _ = n.write(format!("[{}]: {}\n", cur_time, msg).as_str().as_bytes());

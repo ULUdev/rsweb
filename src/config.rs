@@ -4,20 +4,28 @@ use std::io::Error;
 
 #[derive(Deserialize)]
 pub struct Config {
+    pub http: Option<HTTPConfig>,
+    pub ssl: Option<SslConfig>,
+}
+
+#[derive(Deserialize)]
+pub struct HTTPConfig {
     pub port: usize,
     pub ip: String,
     pub threads: Option<usize>,
     pub resources: Resource,
-    pub ssl: Option<SslConfig>,
     pub logfile: Option<String>,
-    pub resource_cache: Option<bool>,
-    pub cache_capacity: Option<usize>,
 }
 
 #[derive(Deserialize)]
 pub struct SslConfig {
     pub private_key: String,
     pub certificate_chain: String,
+    pub port: usize,
+    pub ip: String,
+    pub threads: Option<usize>,
+    pub resources: Resource,
+    pub logfile: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -26,6 +34,8 @@ pub struct Resource {
     pub index: Option<String>,
     pub routes: Option<Vec<String>>,
     pub aliases: Option<Vec<String>>,
+    pub resource_cache: Option<bool>,
+    pub cache_capacity: Option<usize>,
 }
 
 /// load a config from a file

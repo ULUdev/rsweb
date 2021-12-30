@@ -1,12 +1,12 @@
 use crate::dbuffer::DBuffer;
 use crate::error::ServerError;
+use crate::http::body::Body;
 use crate::http::header::HTTPResponseHeaders;
+use crate::http::request::HTTPMethod;
 use crate::http::request::HTTPRequest;
 use crate::http::response::HTTPResponse;
 use crate::http::MimeType;
-use crate::http::request::HTTPMethod;
 use crate::http::StatusCode;
-use crate::http::body::Body;
 use crate::log;
 use crate::resource::ResourceLoader;
 use crate::route::*;
@@ -100,7 +100,10 @@ impl SSLServer {
         if let Err(_) = logger.set_logfile(lf) {
             logger.log("couldn't open log file", log::LogType::Error);
         }
-        logger.log(format!("starting server (rsweb {})", RSWEB_VERSION), log::LogType::Log);
+        logger.log(
+            format!("starting server (rsweb {})", RSWEB_VERSION),
+            log::LogType::Log,
+        );
         for stream in listener.incoming() {
             match stream {
                 Ok(stream) => {
@@ -152,10 +155,18 @@ impl SSLServer {
                                         let mut body = Body::new(response_body.clone());
                                         if response_body.is_empty() {
                                             status = StatusCode::NotFound;
-                                            header = vec![HTTPResponseHeaders::ContentType(MimeType::Html), HTTPResponseHeaders::Server(RSWEB_SERVER_STR.to_string())];
-                                            body = Body::new(String::from("<h1>404 not found</h1>"));
+                                            header = vec![
+                                                HTTPResponseHeaders::ContentType(MimeType::Html),
+                                                HTTPResponseHeaders::Server(
+                                                    RSWEB_SERVER_STR.to_string(),
+                                                ),
+                                            ];
+                                            body =
+                                                Body::new(String::from("<h1>404 not found</h1>"));
                                         }
-                                        header.push(HTTPResponseHeaders::ContentLength(body.get_bytes().len()));
+                                        header.push(HTTPResponseHeaders::ContentLength(
+                                            body.get_bytes().len(),
+                                        ));
                                         if req.get_method() == HTTPMethod::Head {
                                             body = Body::new(String::new());
                                         }
@@ -184,10 +195,15 @@ impl SSLServer {
                                 let mut body = Body::new(response_body.clone());
                                 if response_body.is_empty() {
                                     status = StatusCode::NotFound;
-                                    header = vec![HTTPResponseHeaders::ContentType(MimeType::Html), HTTPResponseHeaders::Server(RSWEB_SERVER_STR.to_string())];
+                                    header = vec![
+                                        HTTPResponseHeaders::ContentType(MimeType::Html),
+                                        HTTPResponseHeaders::Server(RSWEB_SERVER_STR.to_string()),
+                                    ];
                                     body = Body::new(String::from("<h1>404 not found</h1>"));
                                 }
-                                header.push(HTTPResponseHeaders::ContentLength(body.get_bytes().len()));
+                                header.push(HTTPResponseHeaders::ContentLength(
+                                    body.get_bytes().len(),
+                                ));
                                 if req.get_method() == HTTPMethod::Head {
                                     body = Body::new(String::new());
                                 }

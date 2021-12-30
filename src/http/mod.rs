@@ -96,6 +96,3 @@ impl MimeType {
 }
 
 pub use body::Body;
-pub use header::HTTPResponseHeader;
-#[deprecated(since = "0.6.5", note = "use `HTTPResponseHeader` type instead")]
-pub type Header = HTTPResponseHeader;

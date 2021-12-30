@@ -7,7 +7,9 @@ pub struct Body {
 impl Body {
     /// create an http body from some `content` that is a string
     pub fn new(content: String) -> Body {
-        Body { content: content.bytes().collect() }
+        Body {
+            content: content.bytes().collect(),
+        }
     }
 
     /// create an http body from raw bytes

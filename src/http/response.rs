@@ -18,16 +18,6 @@ impl HTTPResponse {
         }
     }
 
-    /// convert a response to a string
-    #[deprecated(since="0.7.6", note="use `try_to_string` or `to_bytes` instead")]
-    pub fn to_string(&self) -> String {
-        let mut header = String::new();
-        for i in &self.header {
-            header.push_str(format!("{}\r\n", i.to_string()).as_str());
-        }
-        format!("{}\r\n{}\r\n{}", self.status.to_string(), header, self.body.try_to_string().unwrap_or(String::new()))
-    }
-
     /// try to convert a response to a string
     pub fn try_to_string(&self) -> Result<String, std::string::FromUtf8Error> {
         let mut header = String::new();
@@ -35,7 +25,12 @@ impl HTTPResponse {
             header.push_str(format!("{}\r\n", i.to_string()).as_str());
         }
         match self.body.try_to_string() {
-            Ok(n) => Ok(format!("{}\r\n{}\r\n{}", self.status.to_string(), header, n)),
+            Ok(n) => Ok(format!(
+                "{}\r\n{}\r\n{}",
+                self.status.to_string(),
+                header,
+                n
+            )),
             Err(e) => Err(e),
         }
     }

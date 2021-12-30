@@ -1,6 +1,6 @@
 [package]
 name = "rsweb"
-version = "0.7.6"
+version = "0.8.7"
 edition = "2021"
 authors = ["Moritz Sokoll <moritz@sokoll.com>"]
 license = "MIT"
@@ -29,5 +29,6 @@ toml = "0.5"
 serde = "1.0"
 serde_derive = "1.0"
 openssl = "0.10"
+wildmatch = "2.1.0"
 # flate2 = "1.0.17"
 # brotli = "3.3.2"

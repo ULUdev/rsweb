@@ -68,7 +68,10 @@ impl Server {
         if let Err(_) = logger.set_logfile(lf) {
             logger.log("couldn't open logfile", log::LogType::Error);
         }
-        logger.log(format!("starting server (rsweb {})", RSWEB_VERSION), log::LogType::Log);
+        logger.log(
+            format!("starting server (rsweb {})", RSWEB_VERSION),
+            log::LogType::Log,
+        );
         for stream in listener.incoming() {
             match stream {
                 Ok(mut stream) => {
@@ -114,10 +117,18 @@ impl Server {
                                         let mut body = Body::new(response_body.clone());
                                         if response_body.is_empty() {
                                             status = StatusCode::NotFound;
-                                            body = Body::new(String::from("<h1>404 not found</h1>"));
-                                            header = vec![HTTPResponseHeaders::ContentType(MimeType::Html), HTTPResponseHeaders::Server(RSWEB_SERVER_STR.to_string())];
+                                            body =
+                                                Body::new(String::from("<h1>404 not found</h1>"));
+                                            header = vec![
+                                                HTTPResponseHeaders::ContentType(MimeType::Html),
+                                                HTTPResponseHeaders::Server(
+                                                    RSWEB_SERVER_STR.to_string(),
+                                                ),
+                                            ];
                                         }
-                                        header.push(HTTPResponseHeaders::ContentLength(body.get_bytes().len()));
+                                        header.push(HTTPResponseHeaders::ContentLength(
+                                            body.get_bytes().len(),
+                                        ));
                                         if req.get_method() == HTTPMethod::Head {
                                             body = Body::new(String::new());
                                         }
@@ -152,7 +163,9 @@ impl Server {
                                     status = StatusCode::NotFound;
                                     body = Body::new(String::from("<h1>404 not found</h1>"));
                                 }
-                                header.push(HTTPResponseHeaders::ContentLength(body.get_bytes().len()));
+                                header.push(HTTPResponseHeaders::ContentLength(
+                                    body.get_bytes().len(),
+                                ));
                                 if req.get_method() == HTTPMethod::Head {
                                     body = Body::new(String::new());
                                 }
