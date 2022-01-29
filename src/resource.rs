@@ -16,13 +16,19 @@ pub struct ResourceLoader {
 /// a resource loaded by the resource loader
 #[derive(Clone)]
 pub struct Resource {
-    content: String,
+    content: Vec<u8>,
     path: String,
     accessed: SystemTime,
     mime_type: MimeType,
 }
 
 impl Resource {
+    /// create a new resource from bare parts
+    pub fn new(content: Vec<u8>, path: String, accessed: SystemTime, mime_type: MimeType) -> Resource {
+        Resource { content, path, accessed, mime_type }
+    }
+
+
     /// load a new resource
     pub fn load(path: String) -> std::io::Result<Resource> {
         let mime_type: MimeType = match Path::new(&path).extension() {
@@ -44,8 +50,8 @@ impl Resource {
                 return Err(e);
             }
         };
-        let mut content: String = String::new();
-        if let Err(e) = file.read_to_string(&mut content) {
+        let mut content: Vec<u8> = Vec::new();
+        if let Err(e) = file.read_to_end(&mut content) {
             return Err(e);
         }
         let accessed = SystemTime::now();
@@ -59,7 +65,7 @@ impl Resource {
     }
 
     /// get the content of a resource
-    pub fn get_content(&self) -> String {
+    pub fn get_content(&self) -> Vec<u8> {
         self.content.clone()
     }
 
@@ -92,7 +98,7 @@ impl ResourceLoader {
     /// load a resource from cache or file system
     /// # Arguments
     /// `path`: the path relative to the resource root to look for resources
-    pub fn load(&mut self, path: String) -> (String, MimeType) {
+    pub fn load(&mut self, path: String) -> Option<Resource> {
         let mime_type: MimeType = match Path::new(&path).extension() {
             Some(n) => match n.to_str().unwrap_or("") {
                 "html" | "htm" => MimeType::Html,
@@ -107,6 +113,7 @@ impl ResourceLoader {
             None => MimeType::Plaintext,
         };
         if self.use_cache {
+            // TODO: wtf? This needs refactoring
             if let Some(n) = self.resource_cache.clone().get(&path) {
                 if let Ok(md) = metadata(path.as_str()) {
                     if let Ok(time) = md.modified() {
@@ -116,7 +123,7 @@ impl ResourceLoader {
                                     let new = match Resource::load(path.clone()) {
                                         Ok(n) => n,
                                         Err(_) => {
-                                            return (String::new(), MimeType::Other(String::new()));
+                                            return None;
                                         }
                                     };
                                     let _ = self.resource_cache.insert(path, new);
@@ -125,23 +132,23 @@ impl ResourceLoader {
                         }
                     }
                 }
-                return (n.get_content(), mime_type);
+                return Some(n.clone());
             }
         }
         let p = Path::new(path.as_str());
         if !p.exists() {
-            (String::new(), MimeType::Plaintext)
+            return None;
         } else {
             let mut f = match OpenOptions::new().read(true).open(p.to_str().unwrap()) {
                 Ok(n) => n,
                 Err(_) => {
-                    return (String::new(), MimeType::Plaintext);
+                    return None;
                 }
             };
-            let mut buf: String = String::new();
-            match f.read_to_string(&mut buf) {
-                Ok(_) => (buf, mime_type),
-                Err(_) => (String::new(), MimeType::Plaintext),
+            let mut buf: Vec<u8> = Vec::new();
+            match f.read_to_end(&mut buf) {
+                Ok(_) => Some(Resource::new(buf, path, SystemTime::now(), mime_type)),
+                Err(_) => None,
             }
         }
     }

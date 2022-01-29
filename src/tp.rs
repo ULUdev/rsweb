@@ -57,7 +57,7 @@ pub struct ThreadPool {
 impl ThreadPool {
     /// create a new threadpool with `size` many threads
     pub fn new(size: usize) -> ThreadPool {
-        assert!(size > 0);
+        assert!(size > 0, "Threadpool can't be empty");
         let (sender, reciever) = mpsc::channel();
 
         let reciever = Arc::new(Mutex::new(reciever));

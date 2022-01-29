@@ -1,9 +1,7 @@
 use super::cookie::Cookie;
 use super::MimeType;
 
-#[derive(Clone, Debug)]
-// TODO: flate2 crate sounds interesting for implementing compression and decompression
-// brotli crate for brotli compression algorithm
+#[derive(Clone, Debug, Eq, PartialEq)]
 /// encoding method for content
 pub enum ContentEncodingMethod {
     /// gzip compression (Lempel-Ziv coding)

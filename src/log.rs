@@ -61,11 +61,12 @@ impl Logger {
     pub fn log<T: std::fmt::Display>(&mut self, msg: T, msgtype: LogType) {
         match msgtype {
             LogType::Warning => {
+                // TODO: make time be a string formatted in the way used internally
                 let cur_time: DateTime<Local> = Local::now();
                 if let Some(n) = &self.term {
                     let _ = n.eprintln(format!(
                         "[{}]: {}Warning: {}{}{}",
-                        cur_time,
+                        cur_time.format("%d-%m-%Y %H:%M:%S").to_string(),
                         fg(Color::Yellow),
                         fg(Color::White),
                         msg,
@@ -74,7 +75,7 @@ impl Logger {
                 }
                 if let Some(n) = &mut self.file {
                     let _ = n.write(
-                        format!("[{}]: Warning: {}\n", cur_time, msg)
+                        format!("[{}]: Warning: {}\n", cur_time.format("%d-%m-%Y %H:%M:%S").to_string(), msg)
                             .as_str()
                             .as_bytes(),
                     );
@@ -86,7 +87,7 @@ impl Logger {
                 if let Some(n) = &self.term {
                     let _ = n.eprintln(format!(
                         "[{}]: {}Error: {}{}{}",
-                        cur_time,
+                        cur_time.format("%d-%m-%Y %H:%M:%S").to_string(),
                         fg(Color::Red),
                         fg(Color::White),
                         msg,
@@ -95,7 +96,7 @@ impl Logger {
                 }
                 if let Some(n) = &mut self.file {
                     let _ = n.write(
-                        format!("[{}]: Error: {}\n", cur_time, msg)
+                        format!("[{}]: Error: {}\n", cur_time.format("%d-%m-%Y %H:%M:%S").to_string(), msg)
                             .as_str()
                             .as_bytes(),
                     );
@@ -105,10 +106,10 @@ impl Logger {
             LogType::Log => {
                 let cur_time: DateTime<Local> = Local::now();
                 if let Some(n) = &self.term {
-                    let _ = n.eprintln(format!("[{}]: {}", cur_time, msg));
+                    let _ = n.eprintln(format!("[{}]: {}", cur_time.format("%d-%m-%Y %H:%M:%S").to_string(), msg));
                 }
                 if let Some(n) = &mut self.file {
-                    let _ = n.write(format!("[{}]: {}\n", cur_time, msg).as_str().as_bytes());
+                    let _ = n.write(format!("[{}]: {}\n", cur_time.format("%d-%m-%Y %H:%M:%S").to_string(), msg).as_str().as_bytes());
                     let _ = n.flush();
                 }
             }

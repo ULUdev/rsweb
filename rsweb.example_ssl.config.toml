@@ -6,7 +6,7 @@ threads = 1
 logfile = "alternate_log.txt"
 [http.resources]
 root = "."
-routes = ["/*:https://localhost:4343"]
+routes = ["*:https://localhost:4343"]
 
 [ssl.resources]
 root = "."

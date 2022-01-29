@@ -25,13 +25,12 @@ pub struct Router {
 
 impl Router {
     /// create a new router with index page at `index`
+    #[allow(unused_variables)]
     pub fn new(index: String) -> Router {
-        let mut r = Router {
+        Router {
             routemap: HashMap::new(),
             aliasmap: HashMap::new(),
-        };
-        r.aliasmap.insert(String::from("/"), index);
-        r
+        }
     }
 
     /// add a new route
@@ -47,10 +46,9 @@ impl Router {
     /// lookup and return a response if a route was found.
     /// If `pattern` matches multiple keys the first one found gets returned
     pub fn lookup(&self, pattern: String) -> Option<Route> {
-        // TODO: implement glob-like search (effectively match asterisks as wildcards)
         let mut resp: Option<Route> = None;
         for key in self.routemap.keys() {
-            if WildMatch::new(pattern.as_str()).matches(key.as_str()) {
+            if WildMatch::new(key.as_str()).matches(pattern.as_str()) {
                 let body = Body::new(String::new());
                 let loc = self.routemap.get(key.as_str()).unwrap();
                 resp = Some(Route::Route(HTTPResponse::new(
@@ -66,7 +64,7 @@ impl Router {
         }
         if resp.is_none() {
             for alias in self.aliasmap.keys() {
-                if WildMatch::new(pattern.as_str()).matches(alias.as_str()) {
+                if WildMatch::new(alias.as_str()).matches(pattern.as_str()) {
                     resp = Some(Route::Alias(self.aliasmap.get(alias).unwrap().to_string()));
                     break;
                 }

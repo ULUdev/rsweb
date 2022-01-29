@@ -69,7 +69,7 @@ impl Server {
             logger.log("couldn't open logfile", log::LogType::Error);
         }
         logger.log(
-            format!("starting server (rsweb {})", RSWEB_VERSION),
+            format!("starting HTTP server (rsweb {})", RSWEB_VERSION),
             log::LogType::Log,
         );
         for stream in listener.incoming() {
@@ -89,6 +89,7 @@ impl Server {
                         if let Err(_) = buf.read_http_request(&mut stream) {
                             logging.log("failed to read from stream", log::LogType::Error);
                         }
+                        // TODO: only take the headers as string. The body might be non UTF-8
                         let data: String = match buf.to_string() {
                             Ok(n) => n,
                             Err(_) => {
@@ -105,34 +106,28 @@ impl Server {
                                 let resp = match n {
                                     Route::Route(p) => p,
                                     Route::Alias(q) => {
-                                        let (response_body, mime_type) =
-                                            resload.load(q[1..].to_string());
-                                        let mut header = vec![
-                                            HTTPResponseHeaders::ContentType(mime_type),
-                                            HTTPResponseHeaders::Server(
-                                                RSWEB_SERVER_STR.to_string(),
-                                            ),
-                                        ];
-                                        let mut status = StatusCode::Ok;
-                                        let mut body = Body::new(response_body.clone());
-                                        if response_body.is_empty() {
-                                            status = StatusCode::NotFound;
-                                            body =
-                                                Body::new(String::from("<h1>404 not found</h1>"));
-                                            header = vec![
-                                                HTTPResponseHeaders::ContentType(MimeType::Html),
-                                                HTTPResponseHeaders::Server(
-                                                    RSWEB_SERVER_STR.to_string(),
-                                                ),
-                                            ];
+                                        let mut headers = vec![HTTPResponseHeaders::Server(RSWEB_SERVER_STR.to_string())];
+                                        let mut status = StatusCode::InternalServerError;
+                                        let mut body = Body::new(String::new());
+                                        match resload.load(q[1..].to_string()) {
+                                            Some(n) => {
+                                                headers.push(HTTPResponseHeaders::ContentType(n.get_mime()));
+                                                body = Body::from_bytes(n.get_content());
+                                                status = StatusCode::Ok;
+                                            },
+                                            None => {
+                                                headers.push(HTTPResponseHeaders::ContentType(MimeType::Html));
+                                                status = StatusCode::NotFound;
+                                                body = Body::new(String::from("<h1>404 not found</h1>"));
+                                            }
                                         }
-                                        header.push(HTTPResponseHeaders::ContentLength(
+                                        headers.push(HTTPResponseHeaders::ContentLength(
                                             body.get_bytes().len(),
                                         ));
                                         if req.get_method() == HTTPMethod::Head {
                                             body = Body::new(String::new());
                                         }
-                                        HTTPResponse::new(status, header, body)
+                                        HTTPResponse::new(status, headers, body)
                                     }
                                 };
                                 match stream.write(&resp.to_bytes()) {
@@ -147,21 +142,21 @@ impl Server {
                                     }
                                 }
                             } else {
-                                let (response_body, mime_type) =
-                                    resload.load(req.get_path()[1..].to_string());
-                                let mut header = vec![
-                                    HTTPResponseHeaders::ContentType(mime_type),
-                                    HTTPResponseHeaders::Server(RSWEB_SERVER_STR.to_string()),
-                                ];
-                                let mut status = StatusCode::Ok;
-                                let mut body = Body::new(response_body.clone());
-                                if response_body.is_empty() {
-                                    header = vec![
-                                        HTTPResponseHeaders::ContentType(MimeType::Html),
-                                        HTTPResponseHeaders::Server(RSWEB_SERVER_STR.to_string()),
-                                    ];
-                                    status = StatusCode::NotFound;
-                                    body = Body::new(String::from("<h1>404 not found</h1>"));
+                                let mut header = vec![HTTPResponseHeaders::Server(RSWEB_SERVER_STR.to_string())];
+                                let mut body = Body::new(String::new());
+                                let mut status = StatusCode::InternalServerError;
+                                match resload.load(req.get_path()[1..].to_string()) {
+                                    Some(n) => {
+                                        header.push(HTTPResponseHeaders::ContentType(n.get_mime()));
+                                        body = Body::from_bytes(n.get_content());
+                                        status = StatusCode::Ok;
+                                    },
+                                    None => {
+                                        header.push(HTTPResponseHeaders::ContentType(MimeType::Html));
+                                        // TODO: load 404 page if known and otherwise use derfault
+                                        body = Body::new(String::from("<h1>404 not found</h1>"));
+                                        status = StatusCode::NotFound;
+                                    },
                                 }
                                 header.push(HTTPResponseHeaders::ContentLength(
                                     body.get_bytes().len(),

@@ -15,6 +15,7 @@ pub struct HTTPConfig {
     pub threads: Option<usize>,
     pub resources: Resource,
     pub logfile: Option<String>,
+    pub allowed_methods: Option<Vec<String>>,
 }
 
 #[derive(Deserialize)]
@@ -26,6 +27,7 @@ pub struct SslConfig {
     pub threads: Option<usize>,
     pub resources: Resource,
     pub logfile: Option<String>,
+    pub allowed_methods: Option<Vec<String>>,
 }
 
 #[derive(Deserialize)]
