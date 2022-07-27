@@ -1,0 +1,26 @@
+image: rust:latest
+
+cache:
+  paths:
+    - target/*
+
+compile:
+  stage: build
+  script:
+    - cargo build
+  tags:
+    - x86_64
+
+unit_test:
+  stage: test
+  script:
+    - cargo test --lib
+  tags:
+    - x86_64
+
+doc_test:
+  stage: test
+  script:
+    - cargo test --doc
+  tags:
+    - x86_64
