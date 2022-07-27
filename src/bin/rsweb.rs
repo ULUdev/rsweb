@@ -24,7 +24,7 @@ fn main() {
     let mut http_handle: Option<std::thread::JoinHandle<()>> = None;
     let mut ssl: bool = false;
     let mut ssl_handle: Option<std::thread::JoinHandle<()>> = None;
-    if let Some(n) = conf.http {
+    if let Some(n) = conf.clone().http {
         http = true;
         let index_page = n
             .resources
@@ -90,6 +90,7 @@ fn main() {
             router.clone(),
             port,
             addr,
+            conf.clone(),
         );
         if let Some(_) = conf.ssl {
             http_handle = Some(thread::spawn(move || match server.run(logfile.as_str()) {
@@ -107,6 +108,7 @@ fn main() {
     if let Some(n) = conf.ssl {
         ssl = true;
         if !http {
+            // remember: there are people not using encryption out there
             eprintln!("warning: using an SSLServer without an HTTP server may lead to compatibility issues.");
         }
         let index_page = n

@@ -1,11 +1,11 @@
 use flate2::read::{DeflateDecoder, GzDecoder};
 // use lzw::Decoder as LzwDecoder;
 // use lzw::LsbReader;
-use brotli::Decompressor as BrotliDecompressor;
 use super::header::ContentEncodingMethod;
+use brotli::Decompressor as BrotliDecompressor;
 use std::io::Error;
-use std::io::Read;
 use std::io::IoSliceMut;
+use std::io::Read;
 
 /// an http body
 #[derive(Clone, Debug)]
@@ -25,13 +25,22 @@ impl Body {
 
     /// create an http body from raw bytes (unencoded/compressed)
     pub fn from_bytes(bytes: Vec<u8>) -> Body {
-        Body { content: bytes, encoding: None }
+        Body {
+            content: bytes,
+            encoding: None,
+        }
     }
 
     /// create a body from bytes with a certain encoding/compression
     pub fn from_bytes_with_encoding(bytes: Vec<u8>, encoding: ContentEncodingMethod) -> Body {
-        assert!(encoding != ContentEncodingMethod::Compress, "lzw compression is not supported");
-        Body { content: bytes, encoding: Some(encoding) }
+        assert!(
+            encoding != ContentEncodingMethod::Compress,
+            "lzw compression is not supported"
+        );
+        Body {
+            content: bytes,
+            encoding: Some(encoding),
+        }
     }
 
     /// return the content as bytes
@@ -64,20 +73,22 @@ impl Body {
                 ContentEncodingMethod::Compress => panic!("LZW is currently not supported"),
                 ContentEncodingMethod::Deflate => {
                     let mut deflater = DeflateDecoder::new(&self.content[..]);
-                    let mut s = String::new();
-                    match deflater.read_to_string(&mut s) {
-                        Ok(_) => Ok(s.bytes().collect()),
+                    let mut v: Vec<u8> = Vec::new();
+                    let ios = IoSliceMut::new(&mut v);
+                    match deflater.read_vectored(&mut [ios]) {
+                        Ok(_) => Ok(v),
                         Err(e) => Err(e),
                     }
                 }
                 ContentEncodingMethod::Br => {
                     let mut brdecompressor = BrotliDecompressor::new(&self.content[..], 32);
-                    let mut s = String::new();
-                    match brdecompressor.read_to_string(&mut s) {
-                        Ok(_) => Ok(s.bytes().collect()),
+                    let mut v: Vec<u8> = Vec::new();
+                    let ios = IoSliceMut::new(&mut v);
+                    match brdecompressor.read_vectored(&mut [ios]) {
+                        Ok(_) => Ok(v),
                         Err(e) => Err(e),
                     }
-                },
+                }
             }
         }
     }
@@ -99,6 +110,4 @@ impl Body {
         //     }
         // }
     }
-
-
 }

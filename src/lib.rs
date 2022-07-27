@@ -6,7 +6,9 @@
 //! use rsweb::resource::ResourceLoader;
 //! use rsweb::route::Router;
 //! use rsweb::server::Server;
+//! use rsweb::config::Config;
 //!
+//! let conf = Config {http: None, ssl: None}; // just a config so this example works. In reality you would load a config
 //! let mut server = Server::new(
 //!     10, // number of threads
 //!     ResourceLoader::new(10, ".".to_string(), true), // create a new resource loader with capacity 10
@@ -14,6 +16,7 @@
 //!     Router::new(String::from("/index.html")), // create a new router with index at index.html
 //!     8080, // port
 //!     std::net::IpAddr::V4(std::net::Ipv4Addr::new(127,0,0,1)), // ip (localhost in this case)
+//!     conf,
 //! );
 //! ```
 //!
@@ -67,17 +70,52 @@ pub mod tp;
 
 pub use tp::ThreadPool;
 /// version str of rsweb. Used for logging and CLI
-pub const RSWEB_VERSION: &str = "0.8.8";
+pub const RSWEB_VERSION: &str = "0.8.9";
 /// version str of rsweb used in the `Server` response header
-pub const RSWEB_SERVER_STR: &str = "rsweb/0.8.8";
+pub const RSWEB_SERVER_STR: &str = "rsweb/0.8.9";
 
 #[cfg(test)]
 mod tests {
-    use super::tp::ThreadPool;
+    mod thread_pool {
+	use crate::tp::ThreadPool;
+	#[test]
+	fn thread_pool_create() {
+    	    let _ = ThreadPool::new(1);
+	}
+	
+	#[test]
+	#[should_panic]
+	fn empty_thread_pool() {
+            let _ = ThreadPool::new(0);
+	}
+    }
 
-    #[test]
-    #[should_panic]
-    fn empty_thread_pool() {
-        let _ = ThreadPool::new(0);
+    mod dbuffer {
+	use crate::dbuffer::DBuffer;
+
+	#[test]
+	fn dbuffer_create() {
+    	    let _ = DBuffer::new();
+	}
+
+	#[test]
+	fn dbuffer_create_with_cap() {
+	    let _ = DBuffer::with_capacity(6);
+	}
+
+	#[test]
+	fn dbuffer_read() {
+	    let mut dbuffer = DBuffer::new();
+	    let s = String::from("hello");
+	    assert!(dbuffer.read_until_zero(&mut s.as_bytes()).is_ok());
+	}
+
+	#[test]
+	fn dbuffer_to_string() {
+	    let mut dbuffer = DBuffer::new();
+	    let s = String::from("hello");
+	    assert!(dbuffer.read_until_zero(&mut s.as_bytes()).is_ok());
+	    assert!(dbuffer.to_string().is_ok());
+	}
     }
 }

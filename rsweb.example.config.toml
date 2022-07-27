@@ -6,5 +6,6 @@ logfile = "log.txt"
 [http.resources]
 root = "."
 index = "/test.html"
-aliases = ["/test:/test.html"]
+aliases = ["/:/test.html", "/test:/test.html"]
 routes = ["/route:/index.html"]
+notfound_page = "/test.html"

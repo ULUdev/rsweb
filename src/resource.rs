@@ -24,10 +24,19 @@ pub struct Resource {
 
 impl Resource {
     /// create a new resource from bare parts
-    pub fn new(content: Vec<u8>, path: String, accessed: SystemTime, mime_type: MimeType) -> Resource {
-        Resource { content, path, accessed, mime_type }
+    pub fn new(
+        content: Vec<u8>,
+        path: String,
+        accessed: SystemTime,
+        mime_type: MimeType,
+    ) -> Resource {
+        Resource {
+            content,
+            path,
+            accessed,
+            mime_type,
+        }
     }
-
 
     /// load a new resource
     pub fn load(path: String) -> std::io::Result<Resource> {

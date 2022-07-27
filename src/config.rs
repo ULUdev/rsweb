@@ -2,13 +2,13 @@ use serde_derive::Deserialize;
 use std::fs::read_to_string;
 use std::io::Error;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Config {
     pub http: Option<HTTPConfig>,
     pub ssl: Option<SslConfig>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct HTTPConfig {
     pub port: usize,
     pub ip: String,
@@ -18,7 +18,7 @@ pub struct HTTPConfig {
     pub allowed_methods: Option<Vec<String>>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct SslConfig {
     pub private_key: String,
     pub certificate_chain: String,
@@ -30,7 +30,7 @@ pub struct SslConfig {
     pub allowed_methods: Option<Vec<String>>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Resource {
     pub root: String,
     pub index: Option<String>,
@@ -38,6 +38,7 @@ pub struct Resource {
     pub aliases: Option<Vec<String>>,
     pub resource_cache: Option<bool>,
     pub cache_capacity: Option<usize>,
+    pub notfound_page: Option<String>,
 }
 
 /// load a config from a file

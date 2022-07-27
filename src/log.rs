@@ -75,9 +75,13 @@ impl Logger {
                 }
                 if let Some(n) = &mut self.file {
                     let _ = n.write(
-                        format!("[{}]: Warning: {}\n", cur_time.format("%d-%m-%Y %H:%M:%S").to_string(), msg)
-                            .as_str()
-                            .as_bytes(),
+                        format!(
+                            "[{}]: Warning: {}\n",
+                            cur_time.format("%d-%m-%Y %H:%M:%S").to_string(),
+                            msg
+                        )
+                        .as_str()
+                        .as_bytes(),
                     );
                     let _ = n.flush();
                 }
@@ -96,9 +100,13 @@ impl Logger {
                 }
                 if let Some(n) = &mut self.file {
                     let _ = n.write(
-                        format!("[{}]: Error: {}\n", cur_time.format("%d-%m-%Y %H:%M:%S").to_string(), msg)
-                            .as_str()
-                            .as_bytes(),
+                        format!(
+                            "[{}]: Error: {}\n",
+                            cur_time.format("%d-%m-%Y %H:%M:%S").to_string(),
+                            msg
+                        )
+                        .as_str()
+                        .as_bytes(),
                     );
                     let _ = n.flush();
                 }
@@ -106,13 +114,44 @@ impl Logger {
             LogType::Log => {
                 let cur_time: DateTime<Local> = Local::now();
                 if let Some(n) = &self.term {
-                    let _ = n.eprintln(format!("[{}]: {}", cur_time.format("%d-%m-%Y %H:%M:%S").to_string(), msg));
+                    let _ = n.eprintln(format!(
+                        "[{}]: {}",
+                        cur_time.format("%d-%m-%Y %H:%M:%S").to_string(),
+                        msg
+                    ));
                 }
                 if let Some(n) = &mut self.file {
-                    let _ = n.write(format!("[{}]: {}\n", cur_time.format("%d-%m-%Y %H:%M:%S").to_string(), msg).as_str().as_bytes());
+                    let _ = n.write(
+                        format!(
+                            "[{}]: {}\n",
+                            cur_time.format("%d-%m-%Y %H:%M:%S").to_string(),
+                            msg
+                        )
+                        .as_str()
+                        .as_bytes(),
+                    );
                     let _ = n.flush();
                 }
             }
         }
     }
+}
+
+#[macro_export]
+macro_rules! msg {
+    ($logger:expr, $($arg:expr),*) => {{
+        $logger.log(format!($($arg,)*), $crate::log::LogType::Log);
+    }};
+}
+#[macro_export]
+macro_rules! warn {
+    ($logger:expr, $($arg:expr),*) => {{
+        $logger.log(format!($($arg,)*), $crate::log::LogType::Warn);
+    }};
+}
+#[macro_export]
+macro_rules! error {
+    ($logger:expr, $($arg:expr),*) => {{
+        $logger.log(format!($($arg,)*), $crate::log::LogType::Error);
+    }};
 }
