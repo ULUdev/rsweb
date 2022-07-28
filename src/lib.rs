@@ -25,6 +25,9 @@
 //! use rsweb::resource::ResourceLoader;
 //! use rsweb::route::Router;
 //! use rsweb::ssl::SSLServer;
+//! use rsweb::config::Config;
+//!
+//! let conf = Config {http: None, ssl: None}; // just a config so this example works.
 //!
 //! let mut server = SSLServer::new(
 //!     10, // number of threads
@@ -34,6 +37,7 @@
 //!     std::net::IpAddr::V4(std::net::Ipv4Addr::new(127,0,0,1)), // ip (localhost in this case)
 //!     String::from("key.pem"), // private key file
 //!     String::from("certs.pem"), // certificate chain file
+//!     conf,
 //! );
 //! ```
 
@@ -70,9 +74,9 @@ pub mod tp;
 
 pub use tp::ThreadPool;
 /// version str of rsweb. Used for logging and CLI
-pub const RSWEB_VERSION: &str = "0.8.9";
+pub const RSWEB_VERSION: &str = "0.8.10";
 /// version str of rsweb used in the `Server` response header
-pub const RSWEB_SERVER_STR: &str = "rsweb/0.8.9";
+pub const RSWEB_SERVER_STR: &str = "rsweb/0.8.10";
 
 #[cfg(test)]
 mod tests {
