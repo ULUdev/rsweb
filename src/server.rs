@@ -135,7 +135,7 @@ impl Server {
 							}
 						    },
 						    None => Body::new(String::from("<h1>404 Not Found</h1>"))
-						}
+						};
                                             }
                                         }
                                         headers.push(HTTPResponseHeaders::ContentLength(
@@ -183,7 +183,7 @@ impl Server {
 						}
 					    },
 					    None => Body::new(String::from("<h1>404 Not Found</h1>"))
-					}
+					};
                                     }
                                 }
                                 header.push(HTTPResponseHeaders::ContentLength(

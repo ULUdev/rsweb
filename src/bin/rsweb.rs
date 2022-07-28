@@ -105,7 +105,7 @@ fn main() {
         }
     }
 
-    if let Some(n) = conf.ssl {
+    if let Some(n) = conf.clone().ssl {
         ssl = true;
         if !http {
             // remember: there are people not using encryption out there
@@ -179,6 +179,7 @@ fn main() {
             addr,
             privkey,
             cert_chain,
+	    conf.clone(),
         )
         .unwrap_or_else(|_| {
             eprintln!("failed to create SSLServer. Exiting...");

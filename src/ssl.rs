@@ -11,6 +11,7 @@ use crate::http::StatusCode;
 use crate::log;
 use crate::resource::ResourceLoader;
 use crate::route::*;
+use crate::config::Config;
 use crate::ThreadPool;
 use crate::RSWEB_SERVER_STR;
 use crate::RSWEB_VERSION;
@@ -29,6 +30,7 @@ pub struct SSLServer {
     ip: IpAddr,
     router: Router,
     sslacceptor: Arc<SslAcceptor>,
+    config: Config,
 }
 
 impl SSLServer {
@@ -41,6 +43,7 @@ impl SSLServer {
         ip: IpAddr,
         privkeyfile: String,
         certchainfile: String,
+	config: Config,
     ) -> Result<SSLServer, ServerError> {
         let mut acceptor = match SslAcceptor::mozilla_intermediate(SslMethod::tls()) {
             Ok(n) => n,
@@ -76,6 +79,7 @@ impl SSLServer {
             port,
             ip,
             sslacceptor: acceptor,
+	    config,
         })
     }
 
@@ -110,6 +114,7 @@ impl SSLServer {
                     let mut resload = self.rl.clone();
                     let router = self.router.clone();
                     let logfile = lf.to_string();
+		    let config = self.config.clone();
 
                     self.tp.execute(move || {
                         let mut logging = log::Logger::new();
@@ -156,9 +161,20 @@ impl SSLServer {
                                                 headers.push(HTTPResponseHeaders::ContentType(
                                                     MimeType::Html,
                                                 ));
-                                                body = Body::new(String::from(
-                                                    "<h1>404 not found</h1>",
-                                                ));
+						body = match config.ssl {
+						    Some(ssl_conf) => {
+							match ssl_conf.resources.notfound_page {
+							    Some(page) => {
+								match resload.load(page[1..].to_string()) {
+								    Some(n) => Body::from_bytes(n.get_content()),
+								    None => Body::new(String::from("<h1>494 Not Found</h1>"))
+								}
+							    },
+							    None => Body::new(String::from("<h1>404 Not Found</h1>"))
+							}
+						    },
+						    None => Body::new(String::from("<h1>404 Not Found</h1>"))
+						};
                                                 status = StatusCode::NotFound;
                                             }
                                         }
@@ -194,7 +210,20 @@ impl SSLServer {
                                     None => {
                                         headers
                                             .push(HTTPResponseHeaders::ContentType(MimeType::Html));
-                                        body = Body::new(String::from("<h1>404 not found</h1>"));
+					body = match config.ssl {
+					    Some(ssl_conf) => {
+						match ssl_conf.resources.notfound_page {
+						    Some(page) => {
+							match resload.load(page[1..].to_string()) {
+							    Some(n) => Body::from_bytes(n.get_content()),
+							    None => Body::new(String::from("<h1>494 Not Found</h1>"))
+							}
+						    },
+						    None => Body::new(String::from("<h1>404 Not Found</h1>"))
+						}
+					    },
+					    None => Body::new(String::from("<h1>404 Not Found</h1>"))
+					};
                                         status = StatusCode::NotFound;
                                     }
                                 }

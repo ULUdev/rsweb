@@ -1,4 +1,5 @@
 # rsweb
+[![pipeline status](https://gitlab.sokoll.com/moritz/rsweb/badges/main/pipeline.svg)](https://gitlab.sokoll.com/moritz/rsweb/-/commits/main)
 ## a web server and creation library for multithreaded web servers
 
 ## Installation

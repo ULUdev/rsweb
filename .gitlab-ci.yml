@@ -1,5 +1,9 @@
 image: rust:latest
 
+before_script:
+  - apt-get update
+  - apt-get install pkg-config libssl-dev -y
+
 cache:
   paths:
     - target/*

@@ -136,4 +136,9 @@ impl HTTPRequest {
     pub fn get_header(&self) -> Vec<HTTPRequestHeaders> {
         self.header.clone()
     }
+
+    /// get the body
+    pub fn get_body(&self) -> Option<String> {
+        self.body.clone()
+    }
 }

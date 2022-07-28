@@ -9,3 +9,6 @@ container:
 
 install: target/release/rsweb-bin
 	mv target/release/rsweb-bin $(PREFIX)/bin/rsweb
+
+clean:
+	cargo clean
